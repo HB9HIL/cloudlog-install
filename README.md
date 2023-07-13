@@ -22,3 +22,17 @@ Install
 source cloudlog-install-v0.1.sh
 ```
 
+Config Options
+
+Use a editor of your choice to edit the script.
+```
+nano cloudlog-install-v0.1.sh
+```
+
+You can edit the following Variables if you have to:
+```
+DB_NAME=cloudlog
+DB_USER=cloudloguser
+DB_PASSWORD=$(openssl rand -base64 16)
+INSTALL_PATH=/var/www/cloudlog
+```
