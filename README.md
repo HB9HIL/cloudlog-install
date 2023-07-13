@@ -20,7 +20,7 @@ cd cloudlog-install && chmod +x cloudlog-install-v0.1.sh
 
 Install
 ```
-source cloudlog-install-v0.1.sh
+bash cloudlog-install-v0.1.sh
 ```
 
 Config Options
