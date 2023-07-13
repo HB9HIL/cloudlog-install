@@ -1,6 +1,7 @@
 # cloudlog Install Script
 
-This Install Script is installing https://github.com/magicbug/Cloudlog on a Debian/Ubuntu System
+This Install Script is installing https://github.com/magicbug/Cloudlog on a Debian/Ubuntu System.
+
 Supports English and German Language
 
 ### Usage
