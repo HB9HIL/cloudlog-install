@@ -1,14 +1,17 @@
 #!/bin/bash
 
-# Set Variables
+# Set Variables (You shouldn't touch)
 
 CHOOSELANG="[eE][nN][gG][lL][iI][sS][hH]|[eE]"
 ANSWER="[yY][eE][sS]|[yY]|[jJ][aA]|[jJ]"
+LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
+
+# Editable Variables
 DB_NAME=cloudlog
 DB_USER=cloudloguser
 DB_PASSWORD=$(openssl rand -base64 16)
 INSTALL_PATH=/var/www/cloudlog
-LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
+
 
 clear
 
