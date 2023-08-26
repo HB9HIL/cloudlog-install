@@ -92,11 +92,14 @@ else
     echo ">>> Es werden nun die benötigten Pakete installiert."
     echo ""
 fi
-sudo add-apt-repository ppa:ondrej/php
+# sudo add-apt-repository ppa:ondrej/php
 sudo apt update
 sudo apt install apache2 mariadb-server nano git curl vim wget -y
 sudo apt install php php-{cli,common,curl,fpm,gd,imap,json,mbstring,mysql,opcache,readline,xml} libapache2-mod-php -y
 sudo systemctl enable apache2
+
+# Write php version tag to a variable
+php_v=$(php -v | grep -oP 'PHP \K[0-9]+\.[0-9]+')
 
 # Prepare the Database
 
@@ -127,7 +130,7 @@ sudo chmod -R g+rw $INSTALL_PATH/images/eqsl_card_images/
 # Configure Apache2
 sudo a2dissite 000-default.conf
 sudo a2enmod proxy_fcgi setenvif
-sudo a2enconf php-fpm
+sudo a2enconf php$php_v-fpm
 sudo a2enmod ssl
 
 config_content=$(cat << EOF
