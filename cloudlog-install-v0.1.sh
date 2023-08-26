@@ -95,7 +95,7 @@ fi
 sudo add-apt-repository ppa:ondrej/php
 sudo apt update
 sudo apt install apache2 mariadb-server nano git curl vim wget -y
-sudo apt install php7.4 php7.4-{cli,common,curl,fpm,gd,imap,json,mbstring,mysql,opcache,readline,xml} libapache2-mod-php7.4 -y
+sudo apt install php php-{cli,common,curl,fpm,gd,imap,json,mbstring,mysql,opcache,readline,xml} libapache2-mod-php -y
 sudo systemctl enable apache2
 
 # Prepare the Database
@@ -127,7 +127,7 @@ sudo chmod -R g+rw $INSTALL_PATH/images/eqsl_card_images/
 # Configure Apache2
 sudo a2dissite 000-default.conf
 sudo a2enmod proxy_fcgi setenvif
-sudo a2enconf php7.4-fpm
+sudo a2enconf php-fpm
 sudo a2enmod ssl
 
 config_content=$(cat << EOF
