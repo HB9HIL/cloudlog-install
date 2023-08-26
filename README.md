@@ -6,6 +6,8 @@ Supports English and German Language
 
 ### Usage
 
+For detailed Information about this script you should check https://www.hb9hil.org/cloudlog-auf-einem-linux-server-installieren/ (german)
+
 Clone the repo
 
 ```
