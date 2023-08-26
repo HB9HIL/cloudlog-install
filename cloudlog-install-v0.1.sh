@@ -79,8 +79,8 @@ else
     echo ""
 fi
 sudo apt update
-sudo apt install aptitude -y
-sudo aptitude safe-upgrade -y
+sudo apt upgrade -y
+sudo apt autoremove -y
 echo ""
 
 # Installation of required packages
