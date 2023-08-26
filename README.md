@@ -11,7 +11,7 @@ For detailed Information about this script you should check https://www.hb9hil.o
 
 Install
 ```
-sudo apt install git -y && git clone https://github.com/HB9HIL/cloudlog-install.git && cd cloudlog-install && chmod +x cloudlog-install-v0.1.sh && bash cloudlog-install-v0.1.sh
+sudo apt update && sudo apt install git -y && git clone https://github.com/HB9HIL/cloudlog-install.git && cd cloudlog-install && chmod +x cloudlog-install-v0.1.sh && bash cloudlog-install-v0.1.sh
 ```
 
 Config Options
