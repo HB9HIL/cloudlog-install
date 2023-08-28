@@ -2,6 +2,12 @@
 
 This Install Script is installing https://github.com/magicbug/Cloudlog on a Debian/Ubuntu System.
 
+It is successfully tested on
+- Debian 11
+- Debian 12
+- Ubuntu 20.04
+- Ubuntu 22.04
+
 Supports English and German Language
 
 ### Usage
