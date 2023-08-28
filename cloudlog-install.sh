@@ -144,6 +144,9 @@ EOF
 )
 echo "$config_content" | sudo tee /etc/apache2/sites-available/cloudlog.conf > /dev/null
 
+# Change Cloudlog's Developement Mode into Production Mode
+sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'production');/" "$INSTALL_PATH/index.php"
+
 sudo a2ensite cloudlog.conf
 sudo systemctl restart apache2
 
