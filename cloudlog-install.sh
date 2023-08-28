@@ -5,6 +5,7 @@
 CHOOSELANG="[eE][nN][gG][lL][iI][sS][hH]|[eE]"
 ANSWER="[yY][eE][sS]|[yY]|[jJ][aA]|[jJ]"
 LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
+PUB_URL=""
 
 # Editable Variables
 DB_NAME=cloudlog
