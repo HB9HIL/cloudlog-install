@@ -144,6 +144,9 @@ EOF
 )
 echo "$config_content" | sudo tee /etc/apache2/sites-available/cloudlog.conf > /dev/null
 
+# Change Cloudlog's Developement Mode into Production Mode
+sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'production');/" "$INSTALL_PATH/index.php"
+
 sudo a2ensite cloudlog.conf
 sudo systemctl restart apache2
 
@@ -194,12 +197,20 @@ if [[ $language =~ ^($CHOOSELANG)$ ]]; then
     echo "+$(printf -- '-%.0s' $(seq -s ' ' $((FIELD_W+1))))+$(printf -- '-%.0s' $(seq -s ' ' $((ENTRY_W+1))))+"""
     echo ""
     echo "Afterwards, click on 'Install'."
+    echo "Congratulations. You can now log in at http://$LOCAL_IP/ or the URL you have set in the 'Website URL' field with the demo credentials."
+    echo "When you have completed the install wizard, do the following:"
+    echo "    - Log in with username m0abc and password demo"
+    echo "    - Create a new admin account (Admin Dropdown) and delete the demo account"
+    echo "    - Update Country Files (Admin Dropdown)"
+    echo "    - Create a station profile (Admin Dropdown) and set it as active"
+    echo "    - If you want to know if the person you're working uses LoTW, run: http://$LOCAL_IP/index.php/lotw/load_users. This is the initial run, but we'll run this every week from cron momentarily."
     echo ""
-    echo "Congratulations. You can now log in at http://$LOCAL_IP/ or the URL you have set in the 'Website URL' field."
     echo "Thank you for using this script. If you encounter any issues, please contact support@hb9hil.org for assistance."
-    echo "Ideally you also run 'sudo mysql_secure_installation'"
-    echo "This is described on https://www.hb9hil.org/cloudlog-auf-einen-linux-server-installieren/ under step 2."
+    echo "The MySQL (MariaDB) installation will now be secured using 'sudo mysql_secure_installation' as a last step"
     echo ""
+    echo ""
+    read -p "Press Enter to continue..."
+    sudo mysql_secure_installation
 
 else
     echo ">>> Das Script ist nun fertig."
@@ -236,11 +247,19 @@ else
     echo "+$(printf -- '-%.0s' $(seq -s ' ' $((FIELD_W+1))))+$(printf -- '-%.0s' $(seq -s ' ' $((ENTRY_W+1))))+"
 
     echo ""
-    echo "Anschliessen klicken Sie auf 'Install'"
+    echo "Klicken Sie anschließend auf 'Installieren'."
+    echo "Herzlichen Glückwunsch. Sie können sich jetzt unter http://$LOCAL_IP/ oder der URL, die Sie im Feld 'Website URL' festgelegt haben, mit den Demo-Anmeldedaten anmelden."
+    echo "Wenn Sie den Installationsassistenten abgeschlossen haben, führen Sie bitte folgende Schritte aus:"
+    echo "    - Melden Sie sich mit Benutzername m0abc und Passwort demo an"
+    echo "    - Erstellen Sie ein neues Administrator-Konto (Administrator-Dropdown) und löschen Sie das Demo-Konto"
+    echo "    - Aktualisieren Sie Länderdateien (Administrator-Dropdown)"
+    echo "    - Erstellen Sie ein Stationsprofil (Administrator-Dropdown) und setzen Sie es als aktiv"
+    echo "    - Wenn Sie wissen möchten, ob die Person, mit der Sie arbeiten, LoTW verwendet, führen Sie Folgendes aus: http://$LOCAL_IP/index.php/lotw/load_users. Dies ist der erste Durchlauf, aber wir werden dies wöchentlich aus dem Cron ausführen."
     echo ""
-    echo "Herzlichen Glückwunsch. Sie können sich nun unter http://$LOCAL_IP/ oder der von Ihnen eingestellten URL bei 'Webseite URL' anmelden."
-    echo "Danke für die Verwendung dieses Scripts. Sollten Probleme auftreten erhalten Sie unter support@hb9hil.org Hilfe."
-    echo "Idealerweise führen Sie noch 'sudo mysql_secure_installation aus'"
-    echo "Dies ist auf https://www.hb9hil.org/cloudlog-auf-einem-linux-server-installieren/ unter Schritt 2 beschrieben"
+    echo "Vielen Dank, dass Sie dieses Skript verwenden. Wenn Sie auf Probleme stoßen, wenden Sie sich bitte an support@hb9hil.org, um Unterstützung zu erhalten."
+    echo "Die MySQL (MariaDB)-Installation wird nun als letzter Schritt noch mit 'sudo mysql_secure_installation' abgesichert."
     echo ""
+    echo ""
+    read -p "Drücken Sie die Eingabetaste, um fortzufahren..."
+    sudo mysql_secure_installation
 fi
