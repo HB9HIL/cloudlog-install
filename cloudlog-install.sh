@@ -200,9 +200,11 @@ if [[ $language =~ ^($CHOOSELANG)$ ]]; then
     echo ""
     echo "Congratulations. You can now log in at http://$LOCAL_IP/ or the URL you have set in the 'Website URL' field."
     echo "Thank you for using this script. If you encounter any issues, please contact support@hb9hil.org for assistance."
-    echo "Ideally you also run 'sudo mysql_secure_installation'"
-    echo "This is described on https://www.hb9hil.org/cloudlog-auf-einen-linux-server-installieren/ under step 2."
+    echo "The MySQL (MariaDB) installation is now secured using 'sudo mysql_secure_installation'"
     echo ""
+    echo ""
+    read -p "Press Enter to continue..."
+    sudo mysql_secure_installation
 
 else
     echo ">>> Das Script ist nun fertig."
@@ -243,7 +245,9 @@ else
     echo ""
     echo "Herzlichen Glückwunsch. Sie können sich nun unter http://$LOCAL_IP/ oder der von Ihnen eingestellten URL bei 'Webseite URL' anmelden."
     echo "Danke für die Verwendung dieses Scripts. Sollten Probleme auftreten erhalten Sie unter support@hb9hil.org Hilfe."
-    echo "Idealerweise führen Sie noch 'sudo mysql_secure_installation aus'"
-    echo "Dies ist auf https://www.hb9hil.org/cloudlog-auf-einem-linux-server-installieren/ unter Schritt 2 beschrieben"
+    echo "Es folgt nun noch die Absicherung der MySQL (MariaDB) Installation mittels 'sudo mysql_secure_installation'"
     echo ""
+    echo ""
+    read -p "Drücken Sie Enter um fortzufahren. Dieser Teil ist nun nur noch auf Englisch verfügbar..."
+    sudo mysql_secure_installation
 fi
