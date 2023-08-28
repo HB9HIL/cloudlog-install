@@ -110,7 +110,7 @@ sudo mysql -u root -e "FLUSH PRIVILEGES"
 
 # Prepare the Webroot Folder
 
-sudo mkdir -p $INSTALL_PATH && sudo git clone https://github.com/magicbug/Cloudlog.git $INSTALL_PATH
+sudo mkdir -p $INSTALL_PATH && sudo git clone -b dev https://github.com/magicbug/Cloudlog.git $INSTALL_PATH
 
 # Set the Permissions
 
