@@ -13,17 +13,21 @@ DEBUG_MODE=false
 export DEBUG_MODE
 SQLREQUIRED=true
 export SQLREQUIRED
+LOG_FILE=installation.log
+
 
 # Set Variables (You shouldn't touch)
 LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
 DEFINED_LANG=""
 
 # Functions
+touch installation.log
 
 debug_stop() {
     if $DEBUG_MODE; then
-        echo "Debug-Mode is active"
+        echo "!!! Debug-Mode is active. Script stopped" >> $LOG_FILE
         read -r -p "Script stopped for debugging. Press Enter to continue or Strg+C to stop the script"
+        cat 
         clear
     fi
 }
@@ -31,6 +35,7 @@ debug_stop() {
 errorstop() {
     clear 
     echo "Uuups... Something went wrong here, Try to start the script again."
+    echo "!!! ERRORSTOP" >> $LOG_FILE
     read -p "Press Enter to stop the script. Restart it manually."
 }
 
@@ -44,8 +49,13 @@ calculating_box() {
 }
 
 # Minimum depencies
-apt update
-apt install git dialog -y
+info_updating_dimensions=$(calculating_box "assets/text/english/info_updating.txt")
+dialog --title "Welcome" --infobox "$(cat assets/text/english/info_updating.txt)" $info_updating_dimensions; sudo apt update >> $LOG_FILE
+info_upgrading_dimensions=$(calculating_box "assets/text/english/info_upgrading.txt")
+dialog --title "Welcome" --infobox "$(cat assets/text/english/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt upgrade -y >> $LOG_FILE
+info_installing_dimensions=$(calculating_box "assets/text/english/info_installing.txt")
+dialog --title "Welcome" --infobox "$(cat assets/text/english/info_installing.txt)" $info_installing_dimensions; sudo apt install git dialog -y >> $LOG_FILE
+
 
 # Debug Mode
 while [[ $# -gt 0 ]]; do
@@ -68,10 +78,13 @@ LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
 
 # Set the DEFINED_LANG Variable
 if [ "$LANG_CHOICE" == "1" ]; then
+    echo "User chose english" >> $LOG_FILE
     DEFINED_LANG="assets/text/english"
 elif [ "$LANG_CHOICE" == "2" ]; then
+    echo "User chose german" >> $LOG_FILE
     DEFINED_LANG="assets/text/german"
 # elif [ "$LANG_CHOICE" == "[more numbers]" ]; then
+#    echo "User chose [language]" >> $LOG_FILE
 #    DEFINED_LANG="assets/text/[more languages]"
 else
     errorstop
@@ -81,9 +94,9 @@ debug_stop
 # Welcome Message
 welcome_dimensions=$(calculating_box "$DEFINED_LANG/welcome.txt")
 if dialog --title "Welcome" --yesno "$(cat $DEFINED_LANG/welcome.txt)" $welcome_dimensions; then
-    echo "User accepted Welcome Message"
+    echo "User accepted Welcome Message" >> $LOG_FILE
 else
-    echo "User did not accept Welcome Message"
+    echo "User did not accept Welcome Message" >> $LOG_FILE
     exit 1
 fi
 debug_stop
@@ -91,10 +104,11 @@ debug_stop
 # Database Setup
 sqlrequired_dimensions=$(calculating_box "$DEFINED_LANG/sqlrequired.txt")
 if dialog --title "Need to install SQL?" --yesno "$(cat $DEFINED_LANG/sqlrequired.txt)" $sqlrequired_dimensions; then
-    echo "User needs to have SQL installed"
+    echo "User needs to have SQL installed" >> $LOG_FILE
 else    
-    echo "User already have SQL installed"
+    echo "User already have SQL installed" >> $LOG_FILE
     SQLREQUIRED=false
+
 fi
 debug_stop
 
@@ -112,29 +126,6 @@ debug_stop
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-# Updates
-if [[ $language =~ ^($CHOOSELANG)$ ]]; then
-    echo ">>> The system will now install updates."
-    echo ""
-else
-    echo ">>> Das System wird nun Updates installieren."
-    echo ""
-fi
-sudo apt update
-sudo apt upgrade -y
-sudo apt autoremove -y
-echo ""
 
 # Installation of required packages
 

@@ -1,1 +1,4 @@
-Wenn bereits ein SQL-Server (MySQL oder MariaDB) installiert ist, wähle NEIN.
+Muss ein SQL noch installiert werden? 
+Unterstützt werden:
+    - MySQL
+    - MariaDB

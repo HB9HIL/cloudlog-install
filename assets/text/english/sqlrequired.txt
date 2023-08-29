@@ -1,1 +1,4 @@
-If you already have an SQL-Server (MySQL or MariaDB) press NO.
+Does a SQL Server need to be installed?
+Supported:
+     - MySQL
+     - MariaDB

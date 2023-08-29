@@ -1,0 +1,3 @@
+The system is installing the minimum depencies to run this script. 
+
+Please wait... This can take a while...
