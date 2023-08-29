@@ -15,7 +15,7 @@ INSTALL_PATH=/var/www/cloudlog
 
 
 # Choose language
-LANG_CHOICE=$(dialog --stdout --menu "Choose Language / Wähle eine Sprache" 0 0 0 \
+LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
     1 "English" \
     2 "Deutsch")
 
