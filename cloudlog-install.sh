@@ -12,13 +12,14 @@ DB_NAME=cloudlog
 DB_USER=cloudloguser
 DB_PASSWORD=$(openssl rand -base64 16)
 INSTALL_PATH=/var/www/cloudlog
-debug_mode=false
+DEBUG_MODE=false
+export DEBUG_MODE
 
 # Options
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --debug)
-            debug_mode=true
+            DEBUG_MODE=true
             shift
             ;;
         *)
@@ -32,6 +33,8 @@ done
 ANSWER="[yY][eE][sS]|[yY]|[jJ][aA]|[jJ]"
 LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
 DEFINED_LANG=""
+
+debug_stop
 
 # Choose language
 LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
@@ -57,6 +60,7 @@ if [[ $? == 1 ]]; then
     exit 1
 fi
 
+debug_stop
 
 # Updates
 if [[ $language =~ ^($CHOOSELANG)$ ]]; then
