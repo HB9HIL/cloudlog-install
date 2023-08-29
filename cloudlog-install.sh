@@ -159,6 +159,10 @@ debug_stop
 
 # Function for the Installation with Progress Bar
 
+##################################################################################################################################
+#######                                                  EDITED UNTIL HERE                                                 #######
+##################################################################################################################################
+
 INSTALL=$(cat $DEFINED_LANG/install.txt)
 INSTALL_RUNNING=$(cat $DEFINED_LANG/install_running.txt)
 INSTALL_COMPLETE=$(cat $DEFINED_LANG/install_complete.txt)
@@ -167,7 +171,7 @@ PLEASE_WAIT=$(cat $DEFINED_LANG/please_wait.txt)
 
 install_packages() {
     for pkg in $DEPENCIES; do
-        apt-get install -y "$pkg" >> "$LOG_FILE" 2>&1
+        sudo apt-get install -y "$pkg" >> "$LOG_FILE" 2>&1
         INSTALL_PROGRESS=$((INSTALL_PROGRESS + 1))
         echo "XXX"
         echo "$INSTALL_PROGRESS"
@@ -194,9 +198,7 @@ clear
 
 exit 1
 
-##################################################################################################################################
-#######                                                  EDITED UNTIL HERE                                                 #######
-##################################################################################################################################
+
 
 
 
