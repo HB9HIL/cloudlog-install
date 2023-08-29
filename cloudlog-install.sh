@@ -4,14 +4,15 @@
 # shellcheck disable=SC2086
 # shellcheck disable=SC2024
 
-# Editable Variables
+# Variables
 DB_NAME=cloudlog
 DB_USER=cloudloguser
 DB_PASSWORD=$(openssl rand -base64 16)
 INSTALL_PATH=/var/www/cloudlog
 DEBUG_MODE=false
 SQLREQUIRED=true
-LOG_FILE=installation.log ## Don't change if you don't need to, file will be overwritten!
+LOG_FILE=assets/log/installation.log ## Don't change if you don't need to, file will be overwritten!
+DEPENCIES="apache2 mariadb-server curl php-common php-curl php-mbstring php-mysql php-xml libapache2-mod-php"
 
 export DB_NAME
 export DB_USER
@@ -53,7 +54,7 @@ errorstop() {
     clear 
     echo "Uuups... Something went wrong here, Try to start the script again."
     echo "!!! ERRORSTOP" >> $LOG_FILE
-    read -p "Press Enter to stop the script. Restart it manually."
+    read -r -p "Press Enter to stop the script. Restart it manually."
 }
 
 calculating_box() {
@@ -76,7 +77,7 @@ dialog --title "Upgrade System" --infobox "$(cat assets/text/general/info_upgrad
 
 echo ">>> sudo apt-get install git dialog -y" >> $LOG_FILE
 info_installing_dimensions=$(calculating_box "assets/text/general/info_installing.txt")
-dialog --title "Install Minimum Depencies" --infobox "$(cat assets/text/general/info_installing.txt)" $info_installing_dimensions; sudo apt-get install git dialog -y >> $LOG_FILE
+dialog --title "Install Minimum Depencies" --infobox "$(cat assets/text/general/info_installing.txt)" $info_installing_dimensions; sudo apt-get install git dialog wget -y >> $LOG_FILE
 
 
 # Choose language
@@ -133,15 +134,52 @@ if dialog --title "SQL Setup" --yesno "$(cat $DEFINED_LANG/sql_setupinfo.txt)" $
 else
     sql_dbname_dimensions=$(calculating_box "$DEFINED_LANG/sql_dbname.txt")
     DB_NAME=$(dialog --title "SQL Setup" --inputbox "$(cat $DEFINED_LANG/sql_dbname.txt)" $sql_dbname_dimensions 3>&1 1>&2 2>&3)
+    echo "User set Database Name to '$DB_NAME'" >> $LOG_FILE
 
     sql_dbuser_dimensions=$(calculating_box "$DEFINED_LANG/sql_dbuser.txt")
     DB_USER=$(dialog --title "SQL Setup" --inputbox "$(cat $DEFINED_LANG/sql_dbuser.txt)" $sql_dbuser_dimensions 3>&1 1>&2 2>&3)
+    echo "User set Database User to '$DB_USER'" >> $LOG_FILE
 
     sql_dbpassword_dimensions=$(calculating_box "$DEFINED_LANG/sql_dbpassword.txt")
-    DB_PASSWORD=$(dialog --title "SQL Setup" --passwordbox "$(cat $DEFINED_LANG/sql_dbpassword.txt)" $sql_dbpassword_dimensions 3>&1 1>&2 2>&3)    
+    DB_PASSWORD=$(dialog --title "SQL Setup" --passwordbox "$(cat $DEFINED_LANG/sql_dbpassword.txt)" $sql_dbpassword_dimensions 3>&1 1>&2 2>&3)
+    echo "User set a Password for the Database User - Hidden for Security" >> $LOG_FILE
 fi
 debug_stop
 
+# Function for the Installation with Progress Bar
+
+INSTALL=$(cat $DEFINED_LANG/install.txt)
+INSTALL_RUNNING=$(cat $DEFINED_LANG/install_running.txt)
+INSTALL_COMPLETE=$(cat $DEFINED_LANG/install_complete.txt)
+INSTALL_SUCCESSFUL=$(cat $DEFINED_LANG/install_successful.txt)
+PLEASE_WAIT=$(cat $DEFINED_LANG/please_wait.txt)
+
+install_packages() {
+    for pkg in $DEPENCIES; do
+        apt-get install -y "$pkg" >> "$LOG_FILE" 2>&1
+        INSTALL_PROGRESS=$((INSTALL_PROGRESS + 1))
+        echo "XXX"
+        echo "$INSTALL_PROGRESS"
+        echo "$INSTALL_RUNNING"
+    done
+}
+
+installation_running_dimensions=$(calculating_box "$DEFINED_LANG/install_running.txt")
+{
+    echo "XXX"
+    echo "0"
+    echo "$INSTALL_RUNNING"
+    install_packages
+    echo "XXX"
+    echo "100"
+    echo "$INSTALL_COMPLETE"
+} | dialog --title "$INSTALL" --gauge "$PLEASE_WAIT" $installation_running_dimensions 0
+
+installation_complete_dimensions=$(calculating_box "$DEFINED_LANG/install_complete.txt")
+dialog --title "$INSTALL_COMPLETE" --infobox "$INSTALL_SUCCESSFUL" $installation_complete_dimensions
+sleep 2
+debug_stop
+clear
 
 
 
@@ -150,30 +188,6 @@ debug_stop
 
 
 
-
-
-
-
-
-
-
-# Installation of required packages
-
-if [[ $language =~ ^($CHOOSELANG)$ ]]; then
-    echo ">>> The system will now install the required packages."
-    echo ""
-else
-    echo ">>> Es werden nun die benötigten Pakete installiert."
-    echo ""
-fi
-# sudo add-apt-repository ppa:ondrej/php
-sudo apt-get update
-sudo apt-get install apache2 mariadb-server nano git curl vim wget -y
-sudo apt-get install php php-{cli,common,curl,fpm,gd,imap,json,mbstring,mysql,opcache,readline,xml} libapache2-mod-php -y
-sudo systemctl enable apache2
-
-# Write php version tag to a variable
-php_v=$(php -v | grep -oP 'PHP \K[0-9]+\.[0-9]+')
 
 # Prepare the Database
 
@@ -204,7 +218,6 @@ sudo chmod -R g+rw $INSTALL_PATH/images/eqsl_card_images/
 # Configure Apache2
 sudo a2dissite 000-default.conf
 sudo a2enmod proxy_fcgi setenvif
-sudo a2enconf php"$php_v"-fpm
 sudo a2enmod ssl
 
 config_content=$(cat << EOF
@@ -283,7 +296,7 @@ if [[ $language =~ ^($CHOOSELANG)$ ]]; then
     echo "The MySQL (MariaDB) installation will now be secured using 'sudo mysql_secure_installation' as a last step"
     echo ""
     echo ""
-    read -p "Press Enter to continue..."
+    read -r -p "Press Enter to continue..."
     sudo mysql_secure_installation
 
 else
@@ -334,6 +347,6 @@ else
     echo "Die MySQL (MariaDB)-Installation wird nun als letzter Schritt noch mit 'sudo mysql_secure_installation' abgesichert."
     echo ""
     echo ""
-    read -p "Drücken Sie die Eingabetaste, um fortzufahren..."
+    read -r -p "Drücken Sie die Eingabetaste, um fortzufahren..."
     sudo mysql_secure_installation
 fi
