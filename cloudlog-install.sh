@@ -18,12 +18,34 @@ export SQLREQUIRED
 LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
 DEFINED_LANG=""
 
+# Functions
+
+debug_stop() {
+    if $DEBUG_MODE; then
+        echo "Debug-Mode is active"
+        read -r -p "Script stopped for debugging. Press Enter to continue or Strg+C to stop the script"
+        clear
+    fi
+}
+
+errorstop() {
+    clear 
+    echo "Uuups... Something went wrong here, Try to start the script again."
+    read -p "Press Enter to stop the script. Restart it manually."
+}
+
+calculating_box() {
+    local content_file="$1"
+    local lines
+    lines=$(wc -l < "$content_file")
+    local max_width=90
+    local max_height=$((lines + 10))  # Adding a buffer for title and buttons
+    echo "$max_height $max_width"
+}
+
 # Minimum depencies
 apt update
 apt install git dialog -y
-
-# Source in Functions Files
-source assets/function/*.sh
 
 # Debug Mode
 while [[ $# -gt 0 ]]; do
@@ -38,7 +60,6 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
-debug_stop
 
 # Choose language
 LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
