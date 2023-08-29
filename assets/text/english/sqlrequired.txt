@@ -1,0 +1,1 @@
+If you already have an SQL-Server (MySQL or MariaDB) press NO.

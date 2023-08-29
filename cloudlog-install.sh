@@ -1,19 +1,29 @@
 #!/bin/bash
 
-# Minimum depencies
-apt update
-apt install git dialog -y
-
 # shellcheck disable=SC1090
-source assets/function/*.sh
+# shellcheck disable=SC2086
 
 # Editable Variables
 DB_NAME=cloudlog
 DB_USER=cloudloguser
 DB_PASSWORD=$(openssl rand -base64 16)
 INSTALL_PATH=/var/www/cloudlog
+export INSTALL_PATH
 DEBUG_MODE=false
 export DEBUG_MODE
+SQLREQUIRED=true
+export SQLREQUIRED
+
+# Set Variables (You shouldn't touch)
+LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
+DEFINED_LANG=""
+
+# Minimum depencies
+apt update
+apt install git dialog -y
+
+# Source in Functions Files
+source assets/function/*.sh
 
 # Debug Mode
 while [[ $# -gt 0 ]]; do
@@ -23,24 +33,11 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            echo "Unbekannte Option: $1"
+            echo "Unknown Option: $1"
             exit 1
             ;;
     esac
 done
-
-debug_stop() {
-    if $DEBUG_MODE; then
-        debug "Debug-Mode is active"
-        read -r -p "Script stopped for debugging. Press Enter to continue or Strg+C to stop the script"
-    fi
-}
-
-# Set Variables (You shouldn't touch)
-ANSWER="[yY][eE][sS]|[yY]|[jJ][aA]|[jJ]"
-LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
-DEFINED_LANG=""
-
 debug_stop
 
 # Choose language
@@ -50,28 +47,60 @@ LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
 
 # Set the DEFINED_LANG Variable
 if [ "$LANG_CHOICE" == "1" ]; then
-    DEFINED_LANG="english"
+    DEFINED_LANG="assets/text/english"
 elif [ "$LANG_CHOICE" == "2" ]; then
-    DEFINED_LANG="german"
+    DEFINED_LANG="assets/text/german"
 # elif [ "$LANG_CHOICE" == "[more numbers]" ]; then
-#    DEFINED_LANG="[more languages]"
+#    DEFINED_LANG="assets/text/[more languages]"
 else
     errorstop
 fi
+debug_stop
 
-# welcome
-
-welcome_dimensions=$(calculating_box "assets/text/$DEFINED_LANG/welcome.txt")
-dialog --title "Welcome" --yesno "$(cat assets/text/$DEFINED_LANG/welcome.txt)" $welcome_dimensions
-
-if [[ $? == 0 ]]; then
+# Welcome Message
+welcome_dimensions=$(calculating_box "$DEFINED_LANG/welcome.txt")
+if dialog --title "Welcome" --yesno "$(cat $DEFINED_LANG/welcome.txt)" $welcome_dimensions; then
     echo "User accepted Welcome Message"
 else
     echo "User did not accept Welcome Message"
     exit 1
 fi
-
 debug_stop
+
+# Database Setup
+sqlrequired_dimensions=$(calculating_box "$DEFINED_LANG/sqlrequired.txt")
+if dialog --title "Need to install SQL?" --yesno "$(cat $DEFINED_LANG/sqlrequired.txt)" $sqlrequired_dimensions; then
+    echo "User needs to have SQL installed"
+else    
+    echo "User already have SQL installed"
+    SQLREQUIRED=false
+fi
+debug_stop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Updates
 if [[ $language =~ ^($CHOOSELANG)$ ]]; then

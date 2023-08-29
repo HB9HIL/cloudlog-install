@@ -1,0 +1,1 @@
+Wenn bereits ein SQL-Server (MySQL oder MariaDB) installiert ist, wähle NEIN.
