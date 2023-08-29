@@ -1,11 +1,8 @@
 #!/bin/bash
 
-# Set Variables (You shouldn't touch)
+# shellcheck disable=SC1090
+source assets/function/*.sh
 
-ANSWER="[yY][eE][sS]|[yY]|[jJ][aA]|[jJ]"
-LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
-DEFINED_LANG=""
-source assets/functions/calculating_box.sh
 
 # Editable Variables
 DB_NAME=cloudlog
@@ -13,6 +10,10 @@ DB_USER=cloudloguser
 DB_PASSWORD=$(openssl rand -base64 16)
 INSTALL_PATH=/var/www/cloudlog
 
+# Set Variables (You shouldn't touch)
+ANSWER="[yY][eE][sS]|[yY]|[jJ][aA]|[jJ]"
+LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
+DEFINED_LANG=""
 
 # Choose language
 LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
@@ -22,37 +23,22 @@ LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
 # Set the DEFINED_LANG Variable
 if [ "$LANG_CHOICE" == "1" ]; then
     DEFINED_LANG="english"
-else
+elif [ "$LANG_CHOICE" == "2" ]; then
     DEFINED_LANG="german"
+# elif [ "$LANG_CHOICE" == "[more numbers]" ]; then
+#    DEFINED_LANG="[more languages]"
+else
+    errorstop
 fi
 
 # welcome
 welcome_dimensions=$(calculating_box "assets/text/$DEFINED_LANG/welcome.txt")
-dialog --title "Welcome" --yesno "$(cat assets/text/$DEFINED_LANG/welcome.txt)" $welcome_dimensions
+dialog --title "Welcome" --yesno "$(cat assets/text/$DEFINED_LANG/welcome.txt)" "$welcome_dimensions"
 
-##################################################################################################################################
-#######                                                  EDITED UNTIL HERE                                                 #######
-##################################################################################################################################
-
-# Check the answer
-
-if [[ $answer =~ ^($ANSWER)$ ]]; then
-    if [[ $language =~ ^($CHOOSELANG)$ ]]; then 
-        echo "Great, the script will proceed."
-    else
-        echo "Super, dann können wir weiter machen!"
-    fi
-else
-    if [[ $language =~ ^($CHOOSELANG)$ ]]; then 
-        echo "Ok, too bad. The script will be aborted. If needed, restart the script."
-        exit 1
-    else
-        echo "OK, schade. Dann hören wir hier mal auf. Starte ggf. neu"
-        exit 1
-    fi
+if [[ $? == 1 ]]; then
+    exit 1
 fi
-echo ""
-sleep 2
+
 
 # Updates
 if [[ $language =~ ^($CHOOSELANG)$ ]]; then
@@ -114,7 +100,7 @@ sudo chmod -R g+rw $INSTALL_PATH/images/eqsl_card_images/
 # Configure Apache2
 sudo a2dissite 000-default.conf
 sudo a2enmod proxy_fcgi setenvif
-sudo a2enconf php$php_v-fpm
+sudo a2enconf php"$php_v"-fpm
 sudo a2enmod ssl
 
 config_content=$(cat << EOF
