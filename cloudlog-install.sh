@@ -30,6 +30,9 @@ fi
 welcome_dimensions=$(calculating_box "assets/text/$DEFINED_LANG/welcome.txt")
 dialog --title "Welcome" --yesno "$(cat assets/text/$DEFINED_LANG/welcome.txt)" $welcome_dimensions
 
+##################################################################################################################################
+#######                                                  EDITED UNTIL HERE                                                 #######
+##################################################################################################################################
 
 # Check the answer
 
