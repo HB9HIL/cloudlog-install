@@ -7,12 +7,26 @@ apt install git dialog -y
 # shellcheck disable=SC1090
 source assets/function/*.sh
 
-
 # Editable Variables
 DB_NAME=cloudlog
 DB_USER=cloudloguser
 DB_PASSWORD=$(openssl rand -base64 16)
 INSTALL_PATH=/var/www/cloudlog
+debug_mode=false
+
+# Options
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --debug)
+            debug_mode=true
+            shift
+            ;;
+        *)
+            echo "Unbekannte Option: $1"
+            exit 1
+            ;;
+    esac
+done
 
 # Set Variables (You shouldn't touch)
 ANSWER="[yY][eE][sS]|[yY]|[jJ][aA]|[jJ]"
