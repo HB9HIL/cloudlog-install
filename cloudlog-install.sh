@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Minimum depencies
+apt update
+apt install git dialog -y
+
 # shellcheck disable=SC1090
 source assets/function/*.sh
 
