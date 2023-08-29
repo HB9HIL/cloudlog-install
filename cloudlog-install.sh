@@ -5,7 +5,7 @@
 ANSWER="[yY][eE][sS]|[yY]|[jJ][aA]|[jJ]"
 LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
 DEFINED_LANG=""
-source functions/calculating_box.sh
+source assets/functions/calculating_box.sh
 
 # Editable Variables
 DB_NAME=cloudlog
@@ -26,13 +26,10 @@ else
     DEFINED_LANG="german"
 fi
 
-# Welcome
+# welcome
+welcome_dimensions=$(calculating_box "assets/text/$DEFINED_LANG/welcome.txt")
+dialog --title "Welcome" --yesno "$(cat assets/text/$DEFINED_LANG/welcome.txt)" $welcome_dimensions
 
-welcome_dimensions=$(calculating_box "assets/$DEFINED_LANG/welcome.txt")
-dialog --title "Welcome" --yesno "$(cat assets/$DEFINED_LANG/welcome.txt)" $welcome_dimensions
-
-echo ""
-echo ""
 
 # Check the answer
 
