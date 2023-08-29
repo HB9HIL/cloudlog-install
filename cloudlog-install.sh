@@ -5,6 +5,7 @@
 # shellcheck disable=SC2024
 
 # Variables
+TMP_DIR=/tmp/cloudlog-tmp
 DB_NAME=cloudlog
 DB_USER=cloudloguser
 DB_PASSWORD=$(openssl rand -base64 16)
@@ -14,6 +15,7 @@ SQLREQUIRED=true
 LOG_FILE=assets/log/installation.log ## Don't change if you don't need to, file will be overwritten!
 DEPENCIES="apache2 mariadb-server curl php-common php-curl php-mbstring php-mysql php-xml libapache2-mod-php"
 
+export TMP_DIR
 export DB_NAME
 export DB_USER
 export INSTALL_PATH
@@ -22,6 +24,10 @@ export SQLREQUIRED
 export LOG_FILE
 
 rm $LOG_FILE && touch $LOG_FILE
+
+# Prepare language files
+mkdir -p $TMP_DIR
+cp -r assets $TMP_DIR
 
 # Set Variables (You shouldn't touch)
 LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
@@ -68,16 +74,16 @@ calculating_box() {
 
 # Minimum depencies
 echo ">>> sudo apt-get update" >> $LOG_FILE
-info_updating_dimensions=$(calculating_box "assets/text/general/info_updating.txt")
-dialog --title "Update Repositories" --infobox "$(cat assets/text/general/info_updating.txt)" $info_updating_dimensions; sudo apt-get update >> $LOG_FILE
+info_updating_dimensions=$(calculating_box "$TMP_DIR/assets/text/general/info_updating.txt")
+dialog --title "Update Repositories" --infobox "$(cat $TMP_DIR/assets/text/general/info_updating.txt)" $info_updating_dimensions; sudo apt-get update >> $LOG_FILE
 
 echo ">>> sudo apt-get upgrade -y" >> $LOG_FILE
-info_upgrading_dimensions=$(calculating_box "assets/text/general/info_upgrading.txt")
-dialog --title "Upgrade System" --infobox "$(cat assets/text/general/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt-get upgrade -y >> $LOG_FILE
+info_upgrading_dimensions=$(calculating_box "$TMP_DIR/assets/text/general/info_upgrading.txt")
+dialog --title "Upgrade System" --infobox "$(cat $TMP_DIR/assets/text/general/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt-get upgrade -y >> $LOG_FILE
 
 echo ">>> sudo apt-get install git dialog -y" >> $LOG_FILE
-info_installing_dimensions=$(calculating_box "assets/text/general/info_installing.txt")
-dialog --title "Install Minimum Depencies" --infobox "$(cat assets/text/general/info_installing.txt)" $info_installing_dimensions; sudo apt-get install git dialog wget -y >> $LOG_FILE
+info_installing_dimensions=$(calculating_box "$TMP_DIR/assets/text/general/info_installing.txt")
+dialog --title "Install Minimum Depencies" --infobox "$(cat $TMP_DIR/assets/text/general/info_installing.txt)" $info_installing_dimensions; sudo apt-get install git dialog wget -y >> $LOG_FILE
 
 
 # Choose language
@@ -89,13 +95,13 @@ LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
 # Set the DEFINED_LANG Variable
 if [ "$LANG_CHOICE" == "1" ]; then
     echo "User chose english" >> $LOG_FILE
-    DEFINED_LANG="assets/text/english"
+    DEFINED_LANG="$TMP_DIR/assets/text/english"
 elif [ "$LANG_CHOICE" == "2" ]; then
     echo "User chose german" >> $LOG_FILE
-    DEFINED_LANG="assets/text/german"
+    DEFINED_LANG="$TMP_DIR/assets/text/german"
 # elif [ "$LANG_CHOICE" == "[more numbers]" ]; then
 #    echo "User chose [language]" >> $LOG_FILE
-#    DEFINED_LANG="assets/text/[more languages]"
+#    DEFINED_LANG="$TMP_DIR/assets/text/[more languages]"
 else
     errorstop
 fi
@@ -128,6 +134,11 @@ else
         exit 1
     fi
 fi
+
+# Prepare sql_setupinfo.txt
+sed -i "s/\$DB_NAME/$DB_NAME/g" $DEFINED_LANG/sql_setupinfo.txt > /dev/null
+sed -i "s/\$DB_USER/$DB_USER/g" $DEFINED_LANG/sql_setupinfo.txt > /dev/null
+
 sql_setupinfo_dimensions=$(calculating_box "$DEFINED_LANG/sql_setupinfo.txt")
 if dialog --title "SQL Setup" --yesno "$(cat $DEFINED_LANG/sql_setupinfo.txt)" $sql_setupinfo_dimensions; then
     echo "User Input: User accepted the default credetials for the database setup. Password will be automatically generated" >> $LOG_FILE
