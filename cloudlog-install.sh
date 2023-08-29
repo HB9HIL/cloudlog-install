@@ -171,7 +171,7 @@ install_packages() {
         INSTALL_PROGRESS=$((INSTALL_PROGRESS + 1))
         echo "XXX"
         echo "$INSTALL_PROGRESS"
-        echo "$INSTALL_RUNNING"
+        echo "$INSTALL_RUNNING" ## Zusätzlich Anzeige des aktuellen Tasks?
     done
 }
 
@@ -194,6 +194,9 @@ clear
 
 
 
+##################################################################################################################################
+#######                                                  EDITED UNTIL HERE                                                 #######
+##################################################################################################################################
 
 
 
