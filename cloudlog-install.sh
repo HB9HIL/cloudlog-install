@@ -5,7 +5,7 @@
 ANSWER="[yY][eE][sS]|[yY]|[jJ][aA]|[jJ]"
 LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
 DEFINED_LANG=""
-source calculating_box.sh
+source functions/calculating_box.sh
 
 # Editable Variables
 DB_NAME=cloudlog
