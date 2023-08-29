@@ -2,9 +2,9 @@
 
 # Set Variables (You shouldn't touch)
 
-CHOOSELANG="[eE][nN][gG][lL][iI][sS][hH]|[eE]"
 ANSWER="[yY][eE][sS]|[yY]|[jJ][aA]|[jJ]"
 LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
+DEFINED_LANG=""
 
 # Editable Variables
 DB_NAME=cloudlog
@@ -13,39 +13,21 @@ DB_PASSWORD=$(openssl rand -base64 16)
 INSTALL_PATH=/var/www/cloudlog
 
 
-clear
-
 # Choose language
-echo "Bitte wähle deine Sprache"
-read -p "Please select your language (E)nglish/(G)erman: " language
-echo ""
-echo ""
+LANG_CHOICE=$(dialog --stdout --menu "Choose Language / Wähle eine Sprache" 0 0 0 \
+    1 "English" \
+    2 "Deutsch")
 
-# Welcome in the choosen language
-
-if [[ $language =~ ^($CHOOSELANG)$ ]]; then
-    echo "Welcome to this installation of Cloudlog."
-    echo "This script for the installation and shows the last necessary steps at the end."
-    echo "Various passwords will be displayed to you. Also have the sudo password ready."
-    echo ""
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo "!!! You should write down these passwords in a safe place !!!"
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo ""
-    # Yes/No
-    read -p "All Right? (yes/no): " answer
+# Set the DEFINED_LANG Variable
+if [ "$LANG_CHOICE" == "1" ]; then
+    DEFINED_LANG="english"
 else
-    echo "Herzlich Willkommen zu dieser Installation von Cloudlog."
-    echo "Dieses Script für die Installation aus und zeigt am Schluss die letzten Notwendigen Schritte an."
-    echo "Dabei werden Ihnen diverse Passwörter angezeigt. Halten Sie zudem das Sudo-Passwort bereit."
-    echo ""
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo "!!! Diese Passwörter sollten Sie sich an einem sicheren Ort notieren !!!"
-    echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-    echo ""
-    # Yes/No
-    read -p "Alles klar? (ja/nein): " answer
+    DEFINED_LANG="german"
 fi
+
+# Welcome
+
+dialog --title "Welcome" --yesno "$(cat assets/welcome_message_$DEFINED_LANG.txt)" 25 90
 
 echo ""
 echo ""
