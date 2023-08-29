@@ -50,11 +50,11 @@ calculating_box() {
 
 # Minimum depencies
 info_updating_dimensions=$(calculating_box "assets/text/english/info_updating.txt")
-dialog --title "Welcome" --infobox "$(cat assets/text/english/info_updating.txt)" $info_updating_dimensions; sudo apt update >> $LOG_FILE
+dialog --title "Welcome" --infobox "$(cat assets/text/english/info_updating.txt)" $info_updating_dimensions; sudo apt-get update >> $LOG_FILE
 info_upgrading_dimensions=$(calculating_box "assets/text/english/info_upgrading.txt")
-dialog --title "Welcome" --infobox "$(cat assets/text/english/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt upgrade -y >> $LOG_FILE
+dialog --title "Welcome" --infobox "$(cat assets/text/english/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt-get upgrade -y >> $LOG_FILE
 info_installing_dimensions=$(calculating_box "assets/text/english/info_installing.txt")
-dialog --title "Welcome" --infobox "$(cat assets/text/english/info_installing.txt)" $info_installing_dimensions; sudo apt install git dialog -y >> $LOG_FILE
+dialog --title "Welcome" --infobox "$(cat assets/text/english/info_installing.txt)" $info_installing_dimensions; sudo apt-get install git dialog -y >> $LOG_FILE
 
 
 # Debug Mode
@@ -137,9 +137,9 @@ else
     echo ""
 fi
 # sudo add-apt-repository ppa:ondrej/php
-sudo apt update
-sudo apt install apache2 mariadb-server nano git curl vim wget -y
-sudo apt install php php-{cli,common,curl,fpm,gd,imap,json,mbstring,mysql,opcache,readline,xml} libapache2-mod-php -y
+sudo apt-get update
+sudo apt-get install apache2 mariadb-server nano git curl vim wget -y
+sudo apt-get install php php-{cli,common,curl,fpm,gd,imap,json,mbstring,mysql,opcache,readline,xml} libapache2-mod-php -y
 sudo systemctl enable apache2
 
 # Write php version tag to a variable
