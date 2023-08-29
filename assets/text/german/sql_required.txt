@@ -1,4 +1,4 @@
-Muss ein SQL noch installiert werden? 
+Muss ein SQL Server noch installiert werden? 
 Unterstützt werden:
     - MySQL
     - MariaDB
