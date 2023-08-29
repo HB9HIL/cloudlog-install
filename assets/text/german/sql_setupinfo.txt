@@ -1,0 +1,7 @@
+Die SQL Datenbank wird mit folgenden Daten erstellt:
+
+Datenbank Name              $DB_NAME
+Datenbank User              $DB_USER
+Datenbank User Passwort     Automatisch generiert (wird am Ende angezeigt)
+
+Bist du damit einverstanden?

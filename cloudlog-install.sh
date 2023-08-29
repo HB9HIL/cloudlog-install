@@ -2,32 +2,49 @@
 
 # shellcheck disable=SC1090
 # shellcheck disable=SC2086
+# shellcheck disable=SC2024
 
 # Editable Variables
 DB_NAME=cloudlog
 DB_USER=cloudloguser
 DB_PASSWORD=$(openssl rand -base64 16)
 INSTALL_PATH=/var/www/cloudlog
-export INSTALL_PATH
 DEBUG_MODE=false
-export DEBUG_MODE
 SQLREQUIRED=true
-export SQLREQUIRED
-LOG_FILE=installation.log
+LOG_FILE=installation.log ## Don't change if you don't need to, file will be overwritten!
 
+export DB_NAME
+export DB_USER
+export INSTALL_PATH
+export DEBUG_MODE
+export SQLREQUIRED
+export LOG_FILE
+
+rm $LOG_FILE && touch $LOG_FILE
 
 # Set Variables (You shouldn't touch)
 LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
 DEFINED_LANG=""
 
-# Functions
-touch installation.log
+## Functions
 
+# Debug Mode
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --debug)
+            DEBUG_MODE=true
+            shift
+            ;;
+        *)
+            echo "Unknown Option: $1"
+            exit 1
+            ;;
+    esac
+done
 debug_stop() {
     if $DEBUG_MODE; then
         echo "!!! Debug-Mode is active. Script stopped" >> $LOG_FILE
         read -r -p "Script stopped for debugging. Press Enter to continue or Strg+C to stop the script"
-        cat 
         clear
     fi
 }
@@ -49,32 +66,24 @@ calculating_box() {
 }
 
 # Minimum depencies
-info_updating_dimensions=$(calculating_box "assets/text/english/info_updating.txt")
-dialog --title "Welcome" --infobox "$(cat assets/text/english/info_updating.txt)" $info_updating_dimensions; sudo apt-get update >> $LOG_FILE
-info_upgrading_dimensions=$(calculating_box "assets/text/english/info_upgrading.txt")
-dialog --title "Welcome" --infobox "$(cat assets/text/english/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt-get upgrade -y >> $LOG_FILE
-info_installing_dimensions=$(calculating_box "assets/text/english/info_installing.txt")
-dialog --title "Welcome" --infobox "$(cat assets/text/english/info_installing.txt)" $info_installing_dimensions; sudo apt-get install git dialog -y >> $LOG_FILE
+echo ">>> sudo apt-get update" >> $LOG_FILE
+info_updating_dimensions=$(calculating_box "assets/text/general/info_updating.txt")
+dialog --title "Update Repositories" --infobox "$(cat assets/text/general/info_updating.txt)" $info_updating_dimensions; sudo apt-get update >> $LOG_FILE
 
+echo ">>> sudo apt-get upgrade -y" >> $LOG_FILE
+info_upgrading_dimensions=$(calculating_box "assets/text/general/info_upgrading.txt")
+dialog --title "Upgrade System" --infobox "$(cat assets/text/general/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt-get upgrade -y >> $LOG_FILE
 
-# Debug Mode
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --debug)
-            DEBUG_MODE=true
-            shift
-            ;;
-        *)
-            echo "Unknown Option: $1"
-            exit 1
-            ;;
-    esac
-done
+echo ">>> sudo apt-get install git dialog -y" >> $LOG_FILE
+info_installing_dimensions=$(calculating_box "assets/text/general/info_installing.txt")
+dialog --title "Install Minimum Depencies" --infobox "$(cat assets/text/general/info_installing.txt)" $info_installing_dimensions; sudo apt-get install git dialog -y >> $LOG_FILE
+
 
 # Choose language
 LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
     1 "English" \
-    2 "Deutsch")
+    2 "Deutsch") # \
+#   3 [more languages] )
 
 # Set the DEFINED_LANG Variable
 if [ "$LANG_CHOICE" == "1" ]; then
@@ -102,13 +111,34 @@ fi
 debug_stop
 
 # Database Setup
-sqlrequired_dimensions=$(calculating_box "$DEFINED_LANG/sqlrequired.txt")
-if dialog --title "Need to install SQL?" --yesno "$(cat $DEFINED_LANG/sqlrequired.txt)" $sqlrequired_dimensions; then
+sql_required_dimensions=$(calculating_box "$DEFINED_LANG/sql_required.txt")
+if dialog --title "Need to install SQL?" --yesno "$(cat $DEFINED_LANG/sql_required.txt)" $sql_required_dimensions; then
     echo "User needs to have SQL installed" >> $LOG_FILE
 else    
     echo "User already have SQL installed" >> $LOG_FILE
     SQLREQUIRED=false
+    sql_info_dimensions=$(calculating_box "$DEFINED_LANG/sql_info.txt")
+    if dialog --title "SQL needs to be on this server" --yesno "$(cat $DEFINED_LANG/sql_info.txt)" $sql_info_dimensions; then
+        echo "User Input: SQL Server is running on this server" >> $LOG_FILE
+    else
+        echo "!!! User Input: SQL Server is running on an external Server" >> $LOG_FILE
+        sql_external_nosupport_dimensions=$(calculating_box "$DEFINED_LANG/sql_external_nosupport.txt")
+        dialog --title "ERROR - External SQL" --textbox "$(cat $DEFINED_LANG/sql_external_nosupport.txt)" $sql_external_nosupport_dimensions
+        exit 1
+    fi
+fi
+sql_setupinfo_dimensions=$(calculating_box "$DEFINED_LANG/sql_setupinfo.txt")
+if dialog --title "SQL Setup" --yesno "$(cat $DEFINED_LANG/sql_setupinfo.txt)" $sql_setupinfo_dimensions; then
+    echo "User Input: User accepted the default credetials for the database setup. Password will be automatically generated" >> $LOG_FILE
+else
+    sql_dbname_dimensions=$(calculating_box "$DEFINED_LANG/sql_dbname.txt")
+    DB_NAME=$(dialog --title "SQL Setup" --inputbox "$(cat $DEFINED_LANG/sql_dbname.txt)" $sql_dbname_dimensions 3>&1 1>&2 2>&3)
 
+    sql_dbuser_dimensions=$(calculating_box "$DEFINED_LANG/sql_dbuser.txt")
+    DB_USER=$(dialog --title "SQL Setup" --inputbox "$(cat $DEFINED_LANG/sql_dbuser.txt)" $sql_dbuser_dimensions 3>&1 1>&2 2>&3)
+
+    sql_dbpassword_dimensions=$(calculating_box "$DEFINED_LANG/sql_dbpassword.txt")
+    DB_PASSWORD=$(dialog --title "SQL Setup" --passwordbox "$(cat $DEFINED_LANG/sql_dbpassword.txt)" $sql_dbpassword_dimensions 3>&1 1>&2 2>&3)    
 fi
 debug_stop
 
@@ -147,9 +177,9 @@ php_v=$(php -v | grep -oP 'PHP \K[0-9]+\.[0-9]+')
 
 # Prepare the Database
 
-sudo mysql -u root -e "CREATE USER '$DB_USER'@localhost IDENTIFIED BY '$DB_PASSWORD'"
+sudo mysql -u root -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD'"
 sudo mysql -u root -e "CREATE DATABASE $DB_NAME"
-sudo mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost'"
+sudo mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%'"
 sudo mysql -u root -e "FLUSH PRIVILEGES"
 
 # Prepare the Webroot Folder

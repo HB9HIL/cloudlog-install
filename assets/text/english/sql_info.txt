@@ -1,0 +1,2 @@
+You indicated that you already have a SQL Server.
+Is this SQL running on this server?

@@ -1,0 +1,7 @@
+The SQL database is created with the following data:
+
+Database name       $DB_NAME
+Database user       $DB_USER
+Database User       Password automatically generated (will be displayed at the end)
+
+Do you agree?
