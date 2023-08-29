@@ -15,7 +15,7 @@ INSTALL_PATH=/var/www/cloudlog
 DEBUG_MODE=false
 export DEBUG_MODE
 
-# Options
+# Debug Mode
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --debug)
@@ -28,6 +28,13 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+debug_stop() {
+    if $DEBUG_MODE; then
+        debug "Debug-Mode is active"
+        read -r -p "Script stopped for debugging. Press Enter to continue or Strg+C to stop the script"
+    fi
+}
 
 # Set Variables (You shouldn't touch)
 ANSWER="[yY][eE][sS]|[yY]|[jJ][aA]|[jJ]"
@@ -53,10 +60,14 @@ else
 fi
 
 # welcome
-welcome_dimensions=$(calculating_box "assets/text/$DEFINED_LANG/welcome.txt")
-dialog --title "Welcome" --yesno "$(cat assets/text/$DEFINED_LANG/welcome.txt)" "$welcome_dimensions"
 
-if [[ $? == 1 ]]; then
+welcome_dimensions=$(calculating_box "assets/text/$DEFINED_LANG/welcome.txt")
+dialog --title "Welcome" --yesno "$(cat assets/text/$DEFINED_LANG/welcome.txt)" $welcome_dimensions
+
+if [[ $? == 0 ]]; then
+    echo "User accepted Welcome Message"
+else
+    echo "User did not accept Welcome Message"
     exit 1
 fi
 
