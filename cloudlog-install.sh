@@ -91,7 +91,6 @@ if dialog --title "Need to install SQL?" --yesno "$(cat $DEFINED_LANG/sql_requir
     install_sql | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL " 20 80
 else    
     echo "User already have SQL installed" >> $LOG_FILE
-    SQLREQUIRED=false
     sql_info_dimensions=$(calculating_box "$DEFINED_LANG/sql_info.txt")
     if dialog --title "SQL needs to be on this server" --yesno "$(cat $DEFINED_LANG/sql_info.txt)" $sql_info_dimensions; then
         echo "User Input: SQL Server is running on this server" >> $LOG_FILE
