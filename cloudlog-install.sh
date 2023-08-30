@@ -5,8 +5,7 @@
 # shellcheck disable=SC2024
 # shellcheck source=/dev/null
 
-source install-config.env
-
+source install-resources/install-config.env
 rm $LOG_FILE && touch $LOG_FILE
 
 # Prepare language files
@@ -14,31 +13,10 @@ mkdir -p $TMP_DIR
 cp -r install-resources $TMP_DIR
 
 ## Functions
-
-# Debug Mode
-while [[ $# -gt 0 ]]; do
-    case "$1" in
-        --debug)
-            DEBUG_MODE=true
-            shift
-            ;;
-        *)
-            echo "Unknown Option: $1"
-            exit 1
-            ;;
-    esac
-done
-debug_stop() {
-    if $DEBUG_MODE; then
-        echo "!!! Debug-Mode is active. Script stopped" >> $LOG_FILE
-        read -r -p "Script stopped for debugging. Press Enter to continue or Strg+C to stop the script"
-        clear
-    fi
-}
-
 errorstop() {
     clear 
     echo "Uuups... Something went wrong here, Try to start the script again."
+    echo "Please create an issue at https://github.com/HB9HIL/cloudlog-install/issues"
     echo "!!! ERRORSTOP" >> $LOG_FILE
     read -r -p "Press Enter to stop the script. Restart it manually."
 }
@@ -61,24 +39,24 @@ install_sql() {
 }
 
 # Minimum depencies Installation
-    DEFINED_LANG="$TMP_DIR/install-resources/text/english"
-    echo ">>> sudo apt-get update" >> $LOG_FILE
-    info_updating_dimensions=$(calculating_box "$DEFINED_LANG/info_updating.txt")
-    dialog --title "Update Repositories" --infobox "$(cat $DEFINED_LANG/info_updating.txt)" $info_updating_dimensions; sudo apt-get update >> $LOG_FILE
+DEFINED_LANG="$TMP_DIR/install-resources/text/english"
+echo ">>> sudo apt-get update" >> $LOG_FILE
+info_updating_dimensions=$(calculating_box "$DEFINED_LANG/info_updating.txt")
+dialog --title "Update Repositories" --infobox "$(cat $DEFINED_LANG/info_updating.txt)" $info_updating_dimensions; sudo apt-get update >> $LOG_FILE
 
-    echo ">>> sudo apt-get upgrade -y" >> $LOG_FILE
-    info_upgrading_dimensions=$(calculating_box "$DEFINED_LANG/info_upgrading.txt")
-    dialog --title "Upgrade System" --infobox "$(cat $DEFINED_LANG/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt-get upgrade -y >> $LOG_FILE
+echo ">>> sudo apt-get upgrade -y" >> $LOG_FILE
+info_upgrading_dimensions=$(calculating_box "$DEFINED_LANG/info_upgrading.txt")
+dialog --title "Upgrade System" --infobox "$(cat $DEFINED_LANG/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt-get upgrade -y >> $LOG_FILE
 
-    echo ">>> sudo apt-get install git dialog -y" >> $LOG_FILE
-    info_installing_dimensions=$(calculating_box "$DEFINED_LANG/info_installing.txt")
-    dialog --title "Install Minimum Depencies" --infobox "$(cat $DEFINED_LANG/info_installing.txt)" $info_installing_dimensions; sudo apt-get install $MINIMUM_DEPENCIES -y >> $LOG_FILE
+echo ">>> sudo apt-get install git dialog -y" >> $LOG_FILE
+info_installing_dimensions=$(calculating_box "$DEFINED_LANG/info_installing.txt")
+dialog --title "Install Minimum Depencies" --infobox "$(cat $DEFINED_LANG/info_installing.txt)" $info_installing_dimensions; sudo apt-get install $MINIMUM_DEPENCIES -y >> $LOG_FILE
 
 
 # Choose language
 LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
     1 "English" \
-    2 "Deutsch") # \
+    2 "Deutsch") 
 #   3 [more languages] )
 
 # Set the DEFINED_LANG Variable
@@ -94,7 +72,7 @@ elif [ "$LANG_CHOICE" == "2" ]; then
 else
     errorstop
 fi
-debug_stop
+
 
 # Welcome Message
 welcome_dimensions=$(calculating_box "$DEFINED_LANG/welcome.txt")
@@ -104,7 +82,7 @@ else
     echo "User did not accept Welcome Message" >> $LOG_FILE
     exit 1
 fi
-debug_stop
+
 
 # Database Setup
 sql_required_dimensions=$(calculating_box "$DEFINED_LANG/sql_required.txt")
@@ -145,28 +123,19 @@ else
     DB_PASSWORD=$(dialog --title "SQL Setup" --passwordbox "$(cat $DEFINED_LANG/sql_dbpassword.txt)" $sql_dbpassword_dimensions 3>&1 1>&2 2>&3)
     echo "User set a Password for the Database User - Hidden for Security" >> $LOG_FILE
 fi
-debug_stop
 
 ## Install all depencies
-    install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL " 20 80
-
-
-##################################################################################################################################
-#######                                                                                                                    #######
-clear && exit 1 ####################################     EDITED UNTIL HERE     ###################################################
-#######                                                                                                                    #######
-##################################################################################################################################
+install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL " 20 80
 
 # Prepare the Database
-
 sudo mysql -u root -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD'"
 sudo mysql -u root -e "CREATE DATABASE $DB_NAME"
 sudo mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%'"
 sudo mysql -u root -e "FLUSH PRIVILEGES"
 
 # Prepare the Webroot Folder
-
-sudo mkdir -p $INSTALL_PATH && sudo git clone -b dev https://github.com/magicbug/Cloudlog.git $INSTALL_PATH
+sudo mkdir -p $INSTALL_PATH
+sudo git clone -b dev https://github.com/magicbug/Cloudlog.git $INSTALL_PATH
 
 # Set the Permissions
 
@@ -194,8 +163,15 @@ echo "$apache2_config_content" | sudo tee /etc/apache2/sites-available/cloudlog.
 # Change Cloudlog's Developement Mode into Production Mode
 sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'production');/" "$INSTALL_PATH/index.php"
 
+# Activate Apache2
 sudo a2ensite cloudlog.conf
 sudo systemctl restart apache2
+
+##################################################################################################################################
+#######                                                                                                                    #######
+clear && exit 1 ####################################     EDITED UNTIL HERE     ###################################################
+#######                                                                                                                    #######
+##################################################################################################################################
 
 # End Message
 FIELD_W=30
