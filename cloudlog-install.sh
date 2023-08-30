@@ -88,7 +88,7 @@ fi
 sql_required_dimensions=$(calculating_box "$DEFINED_LANG/sql_required.txt")
 if dialog --title "Need to install SQL?" --yesno "$(cat $DEFINED_LANG/sql_required.txt)" $sql_required_dimensions; then
     echo "User needs to have SQL installed" >> $LOG_FILE
-    install_sql | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL " 20 80
+    install_sql | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL" 20 80
 else    
     echo "User already have SQL installed" >> $LOG_FILE
     sql_info_dimensions=$(calculating_box "$DEFINED_LANG/sql_info.txt")
@@ -126,7 +126,7 @@ fi
 ## Install all depencies
 install_info_dimensions=$(calculating_box "$DEFINED_LANG/install_info.txt")
 dialog --title "$INSTALL" --msgbox "$(cat $DEFINED_LANG/install_info.txt)" $install_info_dimensions
-install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL " 20 80
+install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL" 20 80
 
 # Prepare the Database
 sudo mysql -u root -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD'"
