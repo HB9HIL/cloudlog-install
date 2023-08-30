@@ -5,7 +5,33 @@
 # shellcheck disable=SC2024
 # shellcheck source=/dev/null
 
-source install-resources/install-config.env
+# Variables
+TMP_DIR=/tmp/cloudlog-tmp
+DB_NAME=cloudlog
+DB_USER=cloudloguser
+DB_PASSWORD=$(openssl rand -base64 16)
+INSTALL_PATH=/var/www/cloudlog
+DEBUG_MODE=false
+LOG_FILE=install-resources/log/installation.log ## Don't change if you don't need to, file will be overwritten!
+MINIMUM_DEPENCIES="git dialog wget" ## Minimum Depencies to run this script
+DEPENCIES="apache2 curl php-common php-curl php-mbstring php-mysql php-xml libapache2-mod-php" ## Without mariadb-server
+
+export TMP_DIR
+export DB_NAME
+export DB_USER
+export INSTALL_PATH
+export DEBUG_MODE
+export SQLREQUIRED
+export LOG_FILE
+
+# Text Variables
+INSTALL=$(cat $DEFINED_LANG/install.txt)
+PRESS_ENTER=$(cat $DEFINED_LANG/press_enter.txt)
+
+# Set Variables (You shouldn't touch)
+LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
+DEFINED_LANG=""
+
 rm $LOG_FILE && touch $LOG_FILE
 
 # Prepare language files
@@ -103,8 +129,8 @@ else
 fi
 
 # Prepare sql_setupinfo.txt
-sed -i "s/\$DB_NAME/$DB_NAME/g" $DEFINED_LANG/sql_setupinfo.txt > /dev/null
-sed -i "s/\$DB_USER/$DB_USER/g" $DEFINED_LANG/sql_setupinfo.txt > /dev/null
+sed -i "s/\$DB_NAME/$DB_NAME/g" $DEFINED_LANG/sql_setupinfo.txt >> $LOG_FILE
+sed -i "s/\$DB_USER/$DB_USER/g" $DEFINED_LANG/sql_setupinfo.txt >> $LOG_FILE
 
 sql_setupinfo_dimensions=$(calculating_box "$DEFINED_LANG/sql_setupinfo.txt")
 if dialog --title "SQL Setup" --yesno "$(cat $DEFINED_LANG/sql_setupinfo.txt)" $sql_setupinfo_dimensions; then
@@ -129,10 +155,10 @@ dialog --title "$INSTALL" --msgbox "$(cat $DEFINED_LANG/install_info.txt)" $inst
 install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL" 20 80
 
 # Prepare the Database
-sudo mysql -u root -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD'"
-sudo mysql -u root -e "CREATE DATABASE $DB_NAME"
-sudo mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%'"
-sudo mysql -u root -e "FLUSH PRIVILEGES"
+sudo mysql -u root -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD'" >> $LOG_FILE
+sudo mysql -u root -e "CREATE DATABASE $DB_NAME" >> $LOG_FILE
+sudo mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%'" >> $LOG_FILE
+sudo mysql -u root -e "FLUSH PRIVILEGES" >> $LOG_FILE
 
 # Prepare the Webroot Folder
 sudo mkdir -p $INSTALL_PATH
