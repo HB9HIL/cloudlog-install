@@ -48,7 +48,7 @@ echo ">>> sudo apt-get upgrade -y" >> $LOG_FILE
 info_upgrading_dimensions=$(calculating_box "$DEFINED_LANG/info_upgrading.txt")
 dialog --title "Upgrade System" --infobox "$(cat $DEFINED_LANG/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt-get upgrade -y >> $LOG_FILE
 
-echo ">>> sudo apt-get install git dialog -y" >> $LOG_FILE
+echo ">>> sudo apt-get install $MINIMUM_DEPENCIES -y" >> $LOG_FILE
 info_installing_dimensions=$(calculating_box "$DEFINED_LANG/info_installing.txt")
 dialog --title "Install Minimum Depencies" --infobox "$(cat $DEFINED_LANG/info_installing.txt)" $info_installing_dimensions; sudo apt-get install $MINIMUM_DEPENCIES -y >> $LOG_FILE
 
@@ -124,6 +124,8 @@ else
 fi
 
 ## Install all depencies
+install_info_dimensions=$(calculating_box "$DEFINED_LANG/install_info.txt")
+dialog --title "$INSTALL" --msgbox "$(cat $DEFINED_LANG/install_info.txt)" $install_info_dimensions
 install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL " 20 80
 
 # Prepare the Database
