@@ -1,37 +1,17 @@
-#!/bin/bash
+#!/bin/bashresources
 
 # shellcheck disable=SC1090
 # shellcheck disable=SC2086
 # shellcheck disable=SC2024
+# shellcheck source=/dev/null
 
-# Variables
-TMP_DIR=/tmp/cloudlog-tmp
-DB_NAME=cloudlog
-DB_USER=cloudloguser
-DB_PASSWORD=$(openssl rand -base64 16)
-INSTALL_PATH=/var/www/cloudlog
-DEBUG_MODE=false
-SQLREQUIRED=true
-LOG_FILE=assets/log/installation.log ## Don't change if you don't need to, file will be overwritten!
-DEPENCIES="apache2 mariadb-server curl php-common php-curl php-mbstring php-mysql php-xml libapache2-mod-php"
-
-export TMP_DIR
-export DB_NAME
-export DB_USER
-export INSTALL_PATH
-export DEBUG_MODE
-export SQLREQUIRED
-export LOG_FILE
+source install-config.env
 
 rm $LOG_FILE && touch $LOG_FILE
 
 # Prepare language files
 mkdir -p $TMP_DIR
-cp -r assets $TMP_DIR
-
-# Set Variables (You shouldn't touch)
-LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
-DEFINED_LANG=""
+cp -r install-resources $TMP_DIR
 
 ## Functions
 
@@ -72,18 +52,27 @@ calculating_box() {
     echo "$max_height $max_width"
 }
 
-# Minimum depencies
-echo ">>> sudo apt-get update" >> $LOG_FILE
-info_updating_dimensions=$(calculating_box "$TMP_DIR/assets/text/general/info_updating.txt")
-dialog --title "Update Repositories" --infobox "$(cat $TMP_DIR/assets/text/general/info_updating.txt)" $info_updating_dimensions; sudo apt-get update >> $LOG_FILE
+install_packages() {
+    sudo apt-get update && sudo apt-get install $DEPENCIES -y && echo "" && echo "" && echo $PRESS_ENTER
+}
 
-echo ">>> sudo apt-get upgrade -y" >> $LOG_FILE
-info_upgrading_dimensions=$(calculating_box "$TMP_DIR/assets/text/general/info_upgrading.txt")
-dialog --title "Upgrade System" --infobox "$(cat $TMP_DIR/assets/text/general/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt-get upgrade -y >> $LOG_FILE
+install_sql() {
+    sudo apt-get update && sudo apt-get install mariadb-server -y && echo "" && echo "" && echo $PRESS_ENTER
+}
 
-echo ">>> sudo apt-get install git dialog -y" >> $LOG_FILE
-info_installing_dimensions=$(calculating_box "$TMP_DIR/assets/text/general/info_installing.txt")
-dialog --title "Install Minimum Depencies" --infobox "$(cat $TMP_DIR/assets/text/general/info_installing.txt)" $info_installing_dimensions; sudo apt-get install git dialog wget -y >> $LOG_FILE
+# Minimum depencies Installation
+    DEFINED_LANG="$TMP_DIR/install-resources/text/english"
+    echo ">>> sudo apt-get update" >> $LOG_FILE
+    info_updating_dimensions=$(calculating_box "$DEFINED_LANG/info_updating.txt")
+    dialog --title "Update Repositories" --infobox "$(cat $DEFINED_LANG/info_updating.txt)" $info_updating_dimensions; sudo apt-get update >> $LOG_FILE
+
+    echo ">>> sudo apt-get upgrade -y" >> $LOG_FILE
+    info_upgrading_dimensions=$(calculating_box "$DEFINED_LANG/info_upgrading.txt")
+    dialog --title "Upgrade System" --infobox "$(cat $DEFINED_LANG/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt-get upgrade -y >> $LOG_FILE
+
+    echo ">>> sudo apt-get install git dialog -y" >> $LOG_FILE
+    info_installing_dimensions=$(calculating_box "$DEFINED_LANG/info_installing.txt")
+    dialog --title "Install Minimum Depencies" --infobox "$(cat $DEFINED_LANG/info_installing.txt)" $info_installing_dimensions; sudo apt-get install $MINIMUM_DEPENCIES -y >> $LOG_FILE
 
 
 # Choose language
@@ -95,13 +84,13 @@ LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
 # Set the DEFINED_LANG Variable
 if [ "$LANG_CHOICE" == "1" ]; then
     echo "User chose english" >> $LOG_FILE
-    DEFINED_LANG="$TMP_DIR/assets/text/english"
+    DEFINED_LANG="$TMP_DIR/install-resources/text/english"
 elif [ "$LANG_CHOICE" == "2" ]; then
     echo "User chose german" >> $LOG_FILE
-    DEFINED_LANG="$TMP_DIR/assets/text/german"
+    DEFINED_LANG="$TMP_DIR/install-resources/text/german"
 # elif [ "$LANG_CHOICE" == "[more numbers]" ]; then
 #    echo "User chose [language]" >> $LOG_FILE
-#    DEFINED_LANG="$TMP_DIR/assets/text/[more languages]"
+#    DEFINED_LANG="$TMP_DIR/install-resources/text/[more languages]"
 else
     errorstop
 fi
@@ -121,6 +110,7 @@ debug_stop
 sql_required_dimensions=$(calculating_box "$DEFINED_LANG/sql_required.txt")
 if dialog --title "Need to install SQL?" --yesno "$(cat $DEFINED_LANG/sql_required.txt)" $sql_required_dimensions; then
     echo "User needs to have SQL installed" >> $LOG_FILE
+    install_sql | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL " 20 80
 else    
     echo "User already have SQL installed" >> $LOG_FILE
     SQLREQUIRED=false
@@ -157,53 +147,15 @@ else
 fi
 debug_stop
 
-# Function for the Installation with Progress Bar
+## Install all depencies
+    install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL " 20 80
+
 
 ##################################################################################################################################
-#######                                                  EDITED UNTIL HERE                                                 #######
+#######                                                                                                                    #######
+clear && exit 1 ####################################     EDITED UNTIL HERE     ###################################################
+#######                                                                                                                    #######
 ##################################################################################################################################
-
-INSTALL=$(cat $DEFINED_LANG/install.txt)
-INSTALL_RUNNING=$(cat $DEFINED_LANG/install_running.txt)
-INSTALL_COMPLETE=$(cat $DEFINED_LANG/install_complete.txt)
-INSTALL_SUCCESSFUL=$(cat $DEFINED_LANG/install_successful.txt)
-PLEASE_WAIT=$(cat $DEFINED_LANG/please_wait.txt)
-
-install_packages() {
-    for pkg in $DEPENCIES; do
-        sudo apt-get install -y "$pkg" >> "$LOG_FILE" 2>&1
-        INSTALL_PROGRESS=$((INSTALL_PROGRESS + 1))
-        echo "XXX"
-        echo "$INSTALL_PROGRESS"
-        echo "$INSTALL_RUNNING" ## Zusätzlich Anzeige des aktuellen Tasks?
-    done
-}
-
-installation_running_dimensions=$(calculating_box "$DEFINED_LANG/install_running.txt")
-{
-    echo "XXX"
-    echo "0"
-    echo "$INSTALL_RUNNING"
-    install_packages
-    echo "XXX"
-    echo "100"
-    echo "$INSTALL_COMPLETE"
-} | dialog --title "$INSTALL" --gauge "$PLEASE_WAIT" $installation_running_dimensions 0
-
-installation_complete_dimensions=$(calculating_box "$DEFINED_LANG/install_complete.txt")
-dialog --title "$INSTALL_COMPLETE" --infobox "$INSTALL_SUCCESSFUL" $installation_complete_dimensions
-sleep 2
-debug_stop
-clear
-
-exit 1
-
-
-
-
-
-
-
 
 # Prepare the Database
 
@@ -236,16 +188,8 @@ sudo a2dissite 000-default.conf
 sudo a2enmod proxy_fcgi setenvif
 sudo a2enmod ssl
 
-config_content=$(cat << EOF
-<VirtualHost *:80>
-        ServerAdmin webmaster@localhost
-        DocumentRoot $INSTALL_PATH
-        ErrorLog ${APACHE_LOG_DIR}/error.log
-        CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-EOF
-)
-echo "$config_content" | sudo tee /etc/apache2/sites-available/cloudlog.conf > /dev/null
+apache2_config_content=$(cat install-resources/apache2_config_cloudlog.conf)
+echo "$apache2_config_content" | sudo tee /etc/apache2/sites-available/cloudlog.conf > /dev/null
 
 # Change Cloudlog's Developement Mode into Production Mode
 sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'production');/" "$INSTALL_PATH/index.php"
