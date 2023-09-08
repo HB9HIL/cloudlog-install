@@ -155,10 +155,12 @@ dialog --title "$INSTALL" --msgbox "$(cat $DEFINED_LANG/install_info.txt)" $inst
 install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL" 20 80
 
 # Prepare the Database
-sudo mysql -u root -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD'" >> $LOG_FILE
-sudo mysql -u root -e "CREATE DATABASE $DB_NAME" >> $LOG_FILE
-sudo mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%'" >> $LOG_FILE
-sudo mysql -u root -e "FLUSH PRIVILEGES" >> $LOG_FILE
+{
+sudo mysql -u root -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD'"
+sudo mysql -u root -e "CREATE DATABASE $DB_NAME"
+sudo mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%'"
+sudo mysql -u root -e "FLUSH PRIVILEGES"
+} >> $LOG_FILE
 
 # Prepare the Webroot Folder
 sudo mkdir -p $INSTALL_PATH
