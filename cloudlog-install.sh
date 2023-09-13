@@ -3,6 +3,7 @@
 # shellcheck disable=SC1090
 # shellcheck disable=SC2086
 # shellcheck disable=SC2024
+# shellcheck disable=SC2005
 # shellcheck source=/dev/null
 
 # Variables
@@ -14,7 +15,7 @@ INSTALL_PATH=/var/www/cloudlog
 DEBUG_MODE=false
 LOG_FILE=install-resources/log/installation.log ## Don't change if you don't need to, file will be overwritten!
 MINIMUM_DEPENCIES="git dialog wget" ## Minimum Depencies to run this script
-DEPENCIES="apache2 curl php-common php-curl php-mbstring php-mysql php-xml libapache2-mod-php" ## Without mariadb-server
+DEPENCIES="apache2 curl php-{common,curl,mbstring,mysql,xml} libapache2-mod-php" ## Without mariadb-server
 
 export TMP_DIR
 export DB_NAME
@@ -48,46 +49,39 @@ calculating_box() {
     local lines
     lines=$(wc -l < "$content_file")
     local max_width=90
-    local max_height=$((lines + 20))  # Adding a buffer for title and buttons
+    local max_height=$((lines + 6))  # Adding a buffer for title and buttons
     echo "$max_height $max_width"
 }
 
 install_packages() {
-    sudo apt-get update
-    sudo apt-get install $DEPENCIES -y
+    apt-get update
+    apt-get install $DEPENCIES -y
     echo ""
     echo ""
-    echo $(cat $DEFINED_LANG/press_enter.txt)
+    echo "$(cat $DEFINED_LANG/press_enter.txt)"
 }
 
 install_sql() {
-    sudo apt-get update
-    sudo apt-get install mariadb-server -y
+    apt-get update
+    apt-get install mariadb-server -y
     echo ""
     echo ""
-    echo $(cat $DEFINED_LANG/press_enter.txt)
-}
-
-git_clone() {
-    sudo git clone https://github.com/magicbug/Cloudlog.git $INSTALL_PATH
-    echo ""
-    echo ""
-    echo $(cat $DEFINED_LANG/press_enter.txt)
+    echo "$(cat $DEFINED_LANG/press_enter.txt)"
 }
 
 # Minimum depencies Installation
 DEFINED_LANG="$TMP_DIR/install-resources/text/english"
-echo ">>> sudo apt-get update" >> $LOG_FILE
+echo ">>>  apt-get update" >> $LOG_FILE
 info_updating_dimensions=$(calculating_box "$DEFINED_LANG/info_updating.txt")
-dialog --title "Update Repositories" --infobox "$(cat $DEFINED_LANG/info_updating.txt)" $info_updating_dimensions; sudo apt-get update >> $LOG_FILE
+dialog --title "Update Repositories" --infobox "$(cat $DEFINED_LANG/info_updating.txt)" $info_updating_dimensions;  apt-get update >> $LOG_FILE
 
-echo ">>> sudo apt-get upgrade -y" >> $LOG_FILE
+echo ">>>  apt-get upgrade -y" >> $LOG_FILE
 info_upgrading_dimensions=$(calculating_box "$DEFINED_LANG/info_upgrading.txt")
-dialog --title "Upgrade System" --infobox "$(cat $DEFINED_LANG/info_upgrading.txt)" $info_upgrading_dimensions; sudo apt-get upgrade -y >> $LOG_FILE
+dialog --title "Upgrade System" --infobox "$(cat $DEFINED_LANG/info_upgrading.txt)" $info_upgrading_dimensions;  apt-get upgrade -y >> $LOG_FILE
 
-echo ">>> sudo apt-get install $MINIMUM_DEPENCIES -y" >> $LOG_FILE
+echo ">>>  apt-get install $MINIMUM_DEPENCIES -y" >> $LOG_FILE
 info_installing_dimensions=$(calculating_box "$DEFINED_LANG/info_installing.txt")
-dialog --title "Install Minimum Depencies" --infobox "$(cat $DEFINED_LANG/info_installing.txt)" $info_installing_dimensions; sudo apt-get install $MINIMUM_DEPENCIES -y >> $LOG_FILE
+dialog --title "Install Minimum Depencies" --infobox "$(cat $DEFINED_LANG/info_installing.txt)" $info_installing_dimensions;  apt-get install $MINIMUM_DEPENCIES -y >> $LOG_FILE
 
 
 # Choose language
@@ -167,54 +161,57 @@ install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$(cat $DEFINE
 
 # Prepare the Database
 {
-sudo mysql -u root -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD'"
-sudo mysql -u root -e "CREATE DATABASE $DB_NAME"
-sudo mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%'"
-sudo mysql -u root -e "FLUSH PRIVILEGES"
+mysql -u root -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD'"
+mysql -u root -e "CREATE DATABASE $DB_NAME"
+mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%'"
+mysql -u root -e "FLUSH PRIVILEGES"
 } >> $LOG_FILE
 
 # Prepare the Webroot Folder
-sudo mkdir -p $INSTALL_PATH
+mkdir -p $INSTALL_PATH
 clear
-git_clone | tee -a $LOG_FILE | dialog --no-ok --programbox "$(cat $DEFINED_LANG/git_clone_info.txt)" 40 120
+git clone https://github.com/magicbug/Cloudlog.git $INSTALL_PATH 2>> $LOG_FILE
+
 
 # Set the Permissions
 
-sudo chown -R root:www-data $INSTALL_PATH/application/config/
-sudo chown -R root:www-data $INSTALL_PATH/assets/qslcard/
-sudo chown -R root:www-data $INSTALL_PATH/backup/
-sudo chown -R root:www-data $INSTALL_PATH/updates/
-sudo chown -R root:www-data $INSTALL_PATH/uploads/
-sudo chown -R root:www-data $INSTALL_PATH/images/eqsl_card_images/
-sudo chmod -R g+rw $INSTALL_PATH/application/config/
-sudo chmod -R g+rw $INSTALL_PATH/assets/qslcard/
-sudo chmod -R g+rw $INSTALL_PATH/backup/
-sudo chmod -R g+rw $INSTALL_PATH/updates/
-sudo chmod -R g+rw $INSTALL_PATH/uploads/
-sudo chmod -R g+rw $INSTALL_PATH/images/eqsl_card_images/
+chown -R root:www-data $INSTALL_PATH/application/config/
+chown -R root:www-data $INSTALL_PATH/assets/qslcard/
+chown -R root:www-data $INSTALL_PATH/backup/
+chown -R root:www-data $INSTALL_PATH/updates/
+chown -R root:www-data $INSTALL_PATH/uploads/
+chown -R root:www-data $INSTALL_PATH/images/eqsl_card_images/
+chmod -R g+rw $INSTALL_PATH/application/config/
+chmod -R g+rw $INSTALL_PATH/assets/qslcard/
+chmod -R g+rw $INSTALL_PATH/backup/
+chmod -R g+rw $INSTALL_PATH/updates/
+chmod -R g+rw $INSTALL_PATH/uploads/
+chmod -R g+rw $INSTALL_PATH/images/eqsl_card_images/
 
 # Configure Apache2
-sudo a2dissite 000-default.conf
-sudo a2enmod proxy_fcgi setenvif
-sudo a2enmod ssl
+a2dissite 000-default.conf
+a2enmod proxy_fcgi setenvif
+a2enmod ssl
 
 apache2_config_content=$(cat install-resources/apache2_config_cloudlog.conf)
-echo "$apache2_config_content" | sudo tee /etc/apache2/sites-available/cloudlog.conf > /dev/null
+echo "$apache2_config_content" | tee /etc/apache2/sites-available/cloudlog.conf > /dev/null
 
 # Change Cloudlog's Developement Mode into Production Mode
 sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'production');/" "$INSTALL_PATH/index.php"
 
 # Activate Apache2
-sudo a2ensite cloudlog.conf
-sudo systemctl restart apache2
+a2ensite /etc/apache2/sites-available/cloudlog.conf
+systemctl restart apache2
 
 clear
-sed -i "s/\$DB_NAME/$DB_NAME/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
-sed -i "s/\$DB_USER/$DB_USER/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
-sed -i "s/\$DB_PASSWORD/$DB_PASSWORD/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
-sed -i "s/\$LOCAL_IP/$LOCAL_IP/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
+{
+sed -i "s/\$DB_NAME/$DB_NAME/g" $DEFINED_LANG/final_message.txt
+sed -i "s/\$DB_USER/$DB_USER/g" $DEFINED_LANG/final_message.txt
+sed -i "s/\$DB_PASSWORD/$DB_PASSWORD/g" $DEFINED_LANG/final_message.txt
+sed -i "s/\$LOCAL_IP/$LOCAL_IP/g" $DEFINED_LANG/final_message.txt
+} >> $LOG_FILE
 
 
 dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 40 140
 cd && clear
-sudo mysql_secure_installation
+mysql_secure_installation
