@@ -118,7 +118,7 @@ fi
 
 # Welcome Message
 welcome_dimensions=$(calculating_box "$DEFINED_LANG/welcome.txt")
-if dialog --title "Welcome" --yesno "$(cat $DEFINED_LANG/welcome.txt)" $welcome_dimensions; then
+if dialog --title "Welcome" --msgbox "$(cat $DEFINED_LANG/welcome.txt)" $welcome_dimensions; then
     echo "User accepted Welcome Message" >> $LOG_FILE
 else
     echo "User did not accept Welcome Message" >> $LOG_FILE
@@ -220,6 +220,6 @@ sed -i "s/\$DB_PASSWORD/$DB_PASSWORD/g" $DEFINED_LANG/final_message.txt >> $LOG_
 sed -i "s/\$LOCAL_IP/$LOCAL_IP/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
 
 
-dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 140 100
+dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 60 120
 clear
 sudo mysql_secure_installation
