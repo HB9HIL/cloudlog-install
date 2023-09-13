@@ -26,6 +26,7 @@ export LOG_FILE
 
 # Text Variables
 INSTALL=$(cat $DEFINED_LANG/install.txt)
+GIT_CLONE_INFO=$(cat $DEFINED_LANG/git_clone_info.txt)
 PRESS_ENTER=$(cat $DEFINED_LANG/press_enter.txt)
 
 # Set Variables (You shouldn't touch)
@@ -62,6 +63,10 @@ install_packages() {
 
 install_sql() {
     sudo apt-get update && sudo apt-get install mariadb-server -y && echo "" && echo "" && echo $PRESS_ENTER
+}
+
+git_clone() {
+    sudo git clone https://github.com/magicbug/Cloudlog.git $INSTALL_PATH && echo "" && echo "" && echo $PRESS_ENTER
 }
 
 # Minimum depencies Installation
@@ -114,7 +119,7 @@ fi
 sql_required_dimensions=$(calculating_box "$DEFINED_LANG/sql_required.txt")
 if dialog --title "Need to install SQL?" --yesno "$(cat $DEFINED_LANG/sql_required.txt)" $sql_required_dimensions; then
     echo "User needs to have SQL installed" >> $LOG_FILE
-    install_sql | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL" 20 80
+    install_sql | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL" 40 120
 else    
     echo "User already have SQL installed" >> $LOG_FILE
     sql_info_dimensions=$(calculating_box "$DEFINED_LANG/sql_info.txt")
@@ -152,7 +157,7 @@ fi
 ## Install all depencies
 install_info_dimensions=$(calculating_box "$DEFINED_LANG/install_info.txt")
 dialog --title "$INSTALL" --msgbox "$(cat $DEFINED_LANG/install_info.txt)" $install_info_dimensions
-install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL" 20 80
+install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$INSTALL" 40 120
 
 # Prepare the Database
 {
@@ -164,7 +169,7 @@ sudo mysql -u root -e "FLUSH PRIVILEGES"
 
 # Prepare the Webroot Folder
 sudo mkdir -p $INSTALL_PATH
-sudo git clone https://github.com/magicbug/Cloudlog.git $INSTALL_PATH
+git_clone | tee -a $LOG_FILE | dialog --no-ok --programbox "$GIT_CLONE_INFO" 40 120
 
 # Set the Permissions
 
@@ -197,8 +202,12 @@ sudo a2ensite cloudlog.conf
 sudo systemctl restart apache2
 
 clear
+sed -i "s/\$DB_NAME/$DB_NAME/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
+sed -i "s/\$DB_USER/$DB_USER/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
+sed -i "s/\$DB_PASSWORD/$DB_PASSWORD/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
+sed -i "s/\$LOCAL_IP/$LOCAL_IP/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
 
 final_message_dimensions=$(calculating_box "$DEFINED_LANG/final_message.txt")
 dialog --title "SQL Setup" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" $final_message_dimensions
-
+clear
 sudo mysql_secure_installation
