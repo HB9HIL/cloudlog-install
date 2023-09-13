@@ -169,6 +169,7 @@ sudo mysql -u root -e "FLUSH PRIVILEGES"
 
 # Prepare the Webroot Folder
 sudo mkdir -p $INSTALL_PATH
+clear
 git_clone | tee -a $LOG_FILE | dialog --no-ok --programbox "$GIT_CLONE_INFO" 40 120
 
 # Set the Permissions
@@ -207,7 +208,7 @@ sed -i "s/\$DB_USER/$DB_USER/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
 sed -i "s/\$DB_PASSWORD/$DB_PASSWORD/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
 sed -i "s/\$LOCAL_IP/$LOCAL_IP/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
 
-final_message_dimensions=$(calculating_box "$DEFINED_LANG/final_message.txt")
-dialog --title "SQL Setup" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" $final_message_dimensions
+
+dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 100 140
 clear
 sudo mysql_secure_installation
