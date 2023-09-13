@@ -158,6 +158,8 @@ fi
 install_info_dimensions=$(calculating_box "$DEFINED_LANG/install_info.txt")
 dialog --title "$(cat $DEFINED_LANG/install.txt)" --msgbox "$(cat $DEFINED_LANG/install_info.txt)" $install_info_dimensions
 install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$(cat $DEFINED_LANG/install.txt)" 40 120
+wait_info_dimensions=$(calculating_box "$DEFINED_LANG/wait_info.txt")
+dialog --title "$(cat $DEFINED_LANG/install.txt)" --msgbox "$(cat $DEFINED_LANG/wait_info.txt)" $install_info_dimensions
 
 # Prepare the Database
 {
@@ -167,10 +169,14 @@ mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%'"
 mysql -u root -e "FLUSH PRIVILEGES"
 } >> $LOG_FILE
 
+
+
+
 # Prepare the Webroot Folder
 mkdir -p $INSTALL_PATH
 clear
 git clone https://github.com/magicbug/Cloudlog.git $INSTALL_PATH 2>> $LOG_FILE
+
 
 
 # Set the Permissions
