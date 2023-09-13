@@ -1,9 +1,5 @@
-Herzlich Willkommen zu dieser Installation von Cloudlog.
-Dieses Script führt die Installation aus und zeigt am Schluss die letzten Notwendigen Schritte an.
-Dabei werden Ihnen diverse Passwörter angezeigt. Halten Sie zudem das Sudo-Passwort bereit.
+>>>      Herzlich Willkommen zu dieser Installation von Cloudlog      <<<
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! Diese Passwörter sollten Sie sich an einem sicheren Ort notieren !!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Dieses Script führt alle notwendigen Schritte aus und führt dich durch den Installationsprozess.
 
-Alles klar?
+Drücke Enter um fortzufahren...

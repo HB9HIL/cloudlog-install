@@ -1,9 +1,5 @@
-Welcome to this installation of Cloudlog.
-This script runs the installation and shows the last necessary steps at the end.
-Various passwords will be displayed to you. Also have the sudo password ready.
+>>>      Welcome to this Cloudlog installation      <<<
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!! You should write down these passwords in a safe place !!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+This script performs all necessary steps and guides you through the installation process.
 
-All right?
+Press Enter to continue...

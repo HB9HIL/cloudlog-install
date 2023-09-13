@@ -58,15 +58,26 @@ calculating_box() {
 }
 
 install_packages() {
-    sudo apt-get update && sudo apt-get install $DEPENCIES -y && echo "" && echo "" && echo $PRESS_ENTER
+    sudo apt-get update
+    sudo apt-get install $DEPENCIES -y
+    echo ""
+    echo ""
+    echo $PRESS_ENTER
 }
 
 install_sql() {
-    sudo apt-get update && sudo apt-get install mariadb-server -y && echo "" && echo "" && echo $PRESS_ENTER
+    sudo apt-get update
+    sudo apt-get install mariadb-server -y
+    echo ""
+    echo ""
+    echo $PRESS_ENTER
 }
 
 git_clone() {
-    sudo git clone https://github.com/magicbug/Cloudlog.git $INSTALL_PATH && echo "" && echo "" && echo $PRESS_ENTER
+    sudo git clone https://github.com/magicbug/Cloudlog.git $INSTALL_PATH
+    echo ""
+    echo ""
+    echo $PRESS_ENTER
 }
 
 # Minimum depencies Installation
@@ -209,6 +220,6 @@ sed -i "s/\$DB_PASSWORD/$DB_PASSWORD/g" $DEFINED_LANG/final_message.txt >> $LOG_
 sed -i "s/\$LOCAL_IP/$LOCAL_IP/g" $DEFINED_LANG/final_message.txt >> $LOG_FILE
 
 
-dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 100 140
+dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 140 100
 clear
 sudo mysql_secure_installation
