@@ -15,7 +15,7 @@ INSTALL_PATH=/var/www/cloudlog
 DEBUG_MODE=false
 LOG_FILE=install-resources/log/installation.log ## Don't change if you don't need to, file will be overwritten!
 MINIMUM_DEPENCIES="git dialog wget" ## Minimum Depencies to run this script
-DEPENCIES="apache2 curl php-{common,curl,mbstring,mysql,xml} libapache2-mod-php" ## Without mariadb-server
+DEPENCIES="apache2 curl php-common php-curl php-mbstring php-mysql php-xml libapache2-mod-php" ## Without mariadb-server
 
 export TMP_DIR
 export DB_NAME
@@ -213,5 +213,8 @@ sed -i "s/\$LOCAL_IP/$LOCAL_IP/g" $DEFINED_LANG/final_message.txt
 
 
 dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 40 140
+
+# Cleaning up
+rm -r $TMP_DIR
 cd && clear
 mysql_secure_installation
