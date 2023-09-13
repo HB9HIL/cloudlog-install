@@ -16,6 +16,7 @@ DEBUG_MODE=false
 LOG_FILE=install-resources/log/installation.log ## Don't change if you don't need to, file will be overwritten!
 MINIMUM_DEPENCIES="git dialog wget" ## Minimum Depencies to run this script
 DEPENCIES="apache2 curl php-common php-curl php-mbstring php-mysql php-xml libapache2-mod-php" ## Without mariadb-server
+CLOUDLOG_REPO="-b dev https://github.com/magicbug/Cloudlog.git"
 
 export TMP_DIR
 export DB_NAME
@@ -199,10 +200,10 @@ mysql -u root -e "FLUSH PRIVILEGES"
 
 # Prepare the Webroot Folder
 mkdir -p $INSTALL_PATH
-clear
-git clone https://github.com/magicbug/Cloudlog.git $INSTALL_PATH 2>> $LOG_FILE
+git clone $CLOUDLOG_REPO $INSTALL_PATH 2>> $LOG_FILE
 
 # Set the Permissions
+{
 chown -R root:www-data $INSTALL_PATH/application/config/
 chown -R root:www-data $INSTALL_PATH/assets/qslcard/
 chown -R root:www-data $INSTALL_PATH/backup/
@@ -215,6 +216,7 @@ chmod -R g+rw $INSTALL_PATH/backup/
 chmod -R g+rw $INSTALL_PATH/updates/
 chmod -R g+rw $INSTALL_PATH/uploads/
 chmod -R g+rw $INSTALL_PATH/images/eqsl_card_images/
+} >> $LOG_FILE
 
 # Configure Apache2
 a2dissite 000-default.conf
