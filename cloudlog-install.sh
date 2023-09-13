@@ -84,6 +84,7 @@ echo "Configuring MySQL server..."
 
 # Run mysql_secure_installation non-interactively with predefined answers
 sudo mysql_secure_installation <<EOF
+$MYSQL_ROOT_PASSWORD
 $UNIX_SOCKET
 $CHANGE_ROOT_PWD
 $REMOVE_ANONYMOUS_USERS
