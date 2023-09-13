@@ -6,13 +6,13 @@ Access the following address with your web browser: http://$LOCAL_IP/install
 
 Now enter the following data in the installer. Note that any reverse proxy must be configured BEFORE clicking 'Install':
 
-DIRECTORY:              left empty or $INSTALL_PATH
-Webseite URL:           planned URL to reach Cloudlog
-Default Gridsquare:     your local Maidenhead-Locator
-Hostname:               localhost
-Username:               $DB_USER
-Password:               $DB_PASSWORD
-Database Name:          $DB_NAME
+DIRECTORY.............. left empty or $INSTALL_PATH
+Webseite URL........... planned URL to reach Cloudlog
+Default Gridsquare..... your local Maidenhead-Locator
+Hostname:.............. localhost
+Username:.............. $DB_USER
+Password:.............. $DB_PASSWORD
+Database Name:......... $DB_NAME
 
 Afterwards, click on "Install".
 Congratulations. You can now log in at http://$LOCAL_IP/ or the URL you have set in the 'Website URL' field with the demo credentials.
@@ -24,7 +24,6 @@ When you have completed the install wizard, do the following:
     - If you want to know if the person you're working uses LoTW, run: http://$LOCAL_IP/index.php/lotw/load_users. This is the initial run, but we'll run this every week from cron momentarily.
 
 Thank you for using this script. If you encounter any issues, please contact support@hb9hil.org for assistance.
-The MySQL (MariaDB) installation will now be secured using 'sudo mysql_secure_installation' as a last step
 Thank you for using this script.
 
-Press Enter to continue...
+Press Enter to exit...

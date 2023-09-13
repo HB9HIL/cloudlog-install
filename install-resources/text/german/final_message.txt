@@ -6,13 +6,13 @@ Rufen Sie die folgende Adresse in Ihrem Webbrowser auf: http://$LOCAL_IP/install
 
 Geben Sie nun die folgenden Daten in den Installer ein. Beachten Sie, dass ein Reverse Proxy VOR dem Klicken auf 'Installieren' konfiguriert werden muss:
 
-DIRECTORY:               leer lassen oder $INSTALL_PATH
-Webseite URL:            geplante URL zum Erreichen von Cloudlog
-Default Gridsquare:      Ihr lokaler Maidenhead-Locator
-Hostname:                localhost
-Username:                $DB_USER
-Password:                $DB_PASSWORD
-Database Name:           $DB_NAME
+DIRECTORY............... leer lassen oder $INSTALL_PATH
+Webseite URL............ geplante URL zum Erreichen von Cloudlog
+Default Gridsquare...... Ihr lokaler Maidenhead-Locator
+Hostname................ localhost
+Username................ $DB_USER
+Password................ $DB_PASSWORD
+Database Name........... $DB_NAME
 
 Klicken Sie anschließend auf "Installieren".
 Herzlichen Glückwunsch. Sie können sich jetzt unter http://$LOCAL_IP/ oder der von Ihnen im Feld 'Webseiten-URL' festgelegten URL mit den Demo-Anmeldeinformationen anmelden.
@@ -24,7 +24,6 @@ Wenn Sie den Installationsassistenten abgeschlossen haben, führen Sie die folge
      - Wenn Sie wissen möchten, ob die Person, mit der Sie arbeiten, LoTW verwendet, führen Sie Folgendes aus: http://$LOCAL_IP/index.php/lotw/load_users. Dies ist der erste Durchlauf, aber wir werden dies jede Woche aus dem Cronjob heraus ausführen.
 
 Vielen Dank, dass Sie dieses Skript verwenden. Wenn Sie auf Probleme stoßen, kontaktieren Sie support@hb9hil.org für Unterstützung.
-Die MySQL (MariaDB)-Installation wird nun mit 'sudo mysql_secure_installation' als letzten Schritt abgesichert.
 Vielen Dank, dass Sie dieses Skript verwenden.
 
-Drücken Sie Enter, um fortzufahren...
+Drücken Sie Enter, um das Script zu verlassen...

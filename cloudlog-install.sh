@@ -69,6 +69,32 @@ install_sql() {
     echo "$(cat $DEFINED_LANG/press_enter.txt)"
 }
 
+securing_mysql() {
+# Set your preferred secure installation options
+MYSQL_ROOT_PASSWORD=""
+UNIX_SOCKET="n"
+CHANGE_ROOT_PWD="n"
+REMOVE_ANONYMOUS_USERS="y"   # Remove anonymous users (y/n)
+DISALLOW_ROOT_LOGIN_REMOTE="y"   # Disallow root login remotely (y/n)
+REMOVE_TEST_DATABASE="y"   # Remove test database and access to it (y/n)
+RELOAD_PRIVILEGE_TABLES="y"   # Reload privilege tables now (y/n)
+
+# Run mysql_secure_installation with predefined answers
+echo "Configuring MySQL server..."
+
+# Run mysql_secure_installation non-interactively with predefined answers
+sudo mysql_secure_installation <<EOF
+$UNIX_SOCKET
+$CHANGE_ROOT_PWD
+$REMOVE_ANONYMOUS_USERS
+$DISALLOW_ROOT_LOGIN_REMOTE
+$REMOVE_TEST_DATABASE
+$RELOAD_PRIVILEGE_TABLES
+EOF
+
+echo "MySQL secure installation completed."
+}
+
 # Minimum depencies Installation
 DEFINED_LANG="$TMP_DIR/install-resources/text/english"
 echo ">>>  apt-get update" >> $LOG_FILE
@@ -163,24 +189,19 @@ dialog --title "$(cat $DEFINED_LANG/install.txt)" --msgbox "$(cat $DEFINED_LANG/
 
 # Prepare the Database
 {
+securing_mysql
 mysql -u root -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD'"
 mysql -u root -e "CREATE DATABASE $DB_NAME"
 mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%'"
 mysql -u root -e "FLUSH PRIVILEGES"
 } >> $LOG_FILE
 
-
-
-
 # Prepare the Webroot Folder
 mkdir -p $INSTALL_PATH
 clear
 git clone https://github.com/magicbug/Cloudlog.git $INSTALL_PATH 2>> $LOG_FILE
 
-
-
 # Set the Permissions
-
 chown -R root:www-data $INSTALL_PATH/application/config/
 chown -R root:www-data $INSTALL_PATH/assets/qslcard/
 chown -R root:www-data $INSTALL_PATH/backup/
@@ -223,4 +244,3 @@ dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DE
 # Cleaning up
 rm -r $TMP_DIR
 cd && clear
-mysql_secure_installation
