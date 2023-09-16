@@ -69,7 +69,6 @@ install_packages() {
 }
 
 install_sql() {
-    apt-get update
     apt-get install mariadb-server -y
     echo ""
     echo ""
@@ -155,7 +154,7 @@ if dpkg -l | grep -E 'mysql-server|mariadb-server'; then
     echo "MySQL oder MariaDB found in system" >> $LOG_FILE
 else    
     echo "MySQL oder MariaDB not found in system" >> $LOG_FILE
-    apt-get install mariadb-server -y | tee -a $LOG_FILE | dialog --no-ok --programbox "$(cat $DEFINED_LANG/sql_info.txt.txt)" 40 120
+    install_sql | tee -a $LOG_FILE | dialog --no-ok --programbox "$(cat $DEFINED_LANG/sql_info.txt)" 40 120
 fi
 
 # Prepare sql_setupinfo.txt
@@ -227,7 +226,7 @@ echo "$apache2_config_content" | tee /etc/apache2/sites-available/cloudlog.conf 
 sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'production');/" "$INSTALL_PATH/index.php"
 
 # Activate Apache2
-a2ensite /etc/apache2/sites-available/cloudlog.conf
+a2ensite cloudlog.conf
 systemctl restart apache2
 
 clear
