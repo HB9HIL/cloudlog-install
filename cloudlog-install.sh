@@ -5,6 +5,7 @@
 # shellcheck disable=SC2024
 # shellcheck disable=SC2005
 # shellcheck disable=SC2120
+# shellcheck disable=SC2046
 # shellcheck source=/dev/null
 
 # Include Snippets
@@ -91,7 +92,7 @@ if dpkg -l | grep -E 'mysql-server|mariadb-server'; then
 else    
     echo "MySQL oder MariaDB not found in system" >> $LOG_FILE
     install_sql | tee -a $LOG_FILE | dialog --no-ok --programbox "$(cat $DEFINED_LANG/sql_info.txt)" 40 120
-    securing_mysql
+    securing_mysql >> $LOG_FILE
 fi
 
 # Prepare sql_setupinfo.txt
@@ -163,7 +164,8 @@ dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DE
 clear
 echo $(cat $DEFINED_LANG/show_dbpassword_1.txt) 
 echo $DB_PASSWORD
-read $(cat $DEFINED_LANG/show_dbpassword_2.txt)
+echo $(cat $DEFINED_LANG/show_dbpassword_2.txt)
+read -r 
 
 # Cleaning up
 DB_PASSWORD="hidden"
