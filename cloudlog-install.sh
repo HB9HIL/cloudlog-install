@@ -8,8 +8,8 @@
 # shellcheck source=/dev/null
 
 # Snippets einbinden
-chmod +x config.sh
-chmod +x install-resources/snippets/*.sh
+chmod 755 config.sh
+chmod 755 install-resources/snippets/*.sh
 source config.sh
 source install-resources/snippets/*.sh
 
