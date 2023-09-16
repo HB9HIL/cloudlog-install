@@ -230,10 +230,10 @@ a2ensite cloudlog.conf
 systemctl restart apache2
 
 {
-sed -i "s/\$DB_NAME/$DB_NAME/g" $DEFINED_LANG/final_message.txt
-sed -i "s/\$DB_USER/$DB_USER/g" $DEFINED_LANG/final_message.txt
-sed -i "s/\$DB_PASSWORD/$DB_PASSWORD/g" $DEFINED_LANG/final_message.txt
-sed -i "s/\$LOCAL_IP/$LOCAL_IP/g" $DEFINED_LANG/final_message.txt
+sed -i "s#\$DB_NAME#$DB_NAME#g" $DEFINED_LANG/final_message.txt
+sed -i "s#\$DB_USER#$DB_USER#g" $DEFINED_LANG/final_message.txt
+sed -i "s#\$DB_PASSWORD#$DB_PASSWORD#g" "$DEFINED_LANG/final_message.txt"
+sed -i "s#\$LOCAL_IP#$LOCAL_IP#g" $DEFINED_LANG/final_message.txt
 } >> $LOG_FILE
 
 
