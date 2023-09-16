@@ -43,6 +43,7 @@ errorstop() {
     echo "Please create an issue at https://github.com/HB9HIL/cloudlog-install/issues"
     echo "!!! ERRORSTOP" >> $LOG_FILE
     read -r -p "Press Enter to stop the script. Restart it manually."
+    exit 1
 }
 trap 'errorstop' ERR
 
@@ -151,7 +152,7 @@ if dpkg -l | grep -E 'mysql-server|mariadb-server'; then
 else    
     echo "MySQL oder MariaDB not found in system" >> $LOG_FILE
     sql_info_dimensions=$(calculating_box "$DEFINED_LANG/sql_info.txt.txt")
-    apt-get install mariadb-server -y | tee -a $LOG_FILE | dialog --programmbox "$(cat $DEFINED_LANG/sql_info.txt.txt)" $sql_info_dimensions
+    apt-get install mariadb-server -y | tee -a $LOG_FILE | dialog --programbox "$(cat $DEFINED_LANG/sql_info.txt.txt)" $sql_info_dimensions
 fi
 
 # Prepare sql_setupinfo.txt
