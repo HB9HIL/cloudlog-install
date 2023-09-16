@@ -1,4 +1,0 @@
-Does a SQL Server need to be installed?
-Supported:
-     - MySQL
-     - MariaDB

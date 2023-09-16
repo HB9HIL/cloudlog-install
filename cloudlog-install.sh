@@ -44,6 +44,7 @@ errorstop() {
     echo "!!! ERRORSTOP" >> $LOG_FILE
     read -r -p "Press Enter to stop the script. Restart it manually."
 }
+trap 'errorstop' ERR
 
 calculating_box() {
     local content_file="$1"
@@ -139,26 +140,18 @@ if dialog --title "Welcome" --msgbox "$(cat $DEFINED_LANG/welcome.txt)" $welcome
     echo "User accepted Welcome Message" >> $LOG_FILE
 else
     echo "User did not accept Welcome Message" >> $LOG_FILE
+    clear
     exit 1
 fi
 
 
 # Database Setup
-sql_required_dimensions=$(calculating_box "$DEFINED_LANG/sql_required.txt")
-if dialog --title "Need to install SQL?" --yesno "$(cat $DEFINED_LANG/sql_required.txt)" $sql_required_dimensions; then
-    echo "User needs to have SQL installed" >> $LOG_FILE
-    install_sql | tee -a $LOG_FILE | dialog --no-ok --programbox "$(cat $DEFINED_LANG/install.txt)" 40 120
+if dpkg -l | grep -E 'mysql-server|mariadb-server'; then
+    echo "MySQL oder MariaDB found in system" >> $LOG_FILE
 else    
-    echo "User already have SQL installed" >> $LOG_FILE
-    sql_info_dimensions=$(calculating_box "$DEFINED_LANG/sql_info.txt")
-    if dialog --title "SQL needs to be on this server" --yesno "$(cat $DEFINED_LANG/sql_info.txt)" $sql_info_dimensions; then
-        echo "User Input: SQL Server is running on this server" >> $LOG_FILE
-    else
-        echo "!!! User Input: SQL Server is running on an external Server" >> $LOG_FILE
-        sql_external_nosupport_dimensions=$(calculating_box "$DEFINED_LANG/sql_external_nosupport.txt")
-        dialog --title "ERROR - External SQL" --textbox "$(cat $DEFINED_LANG/sql_external_nosupport.txt)" $sql_external_nosupport_dimensions
-        exit 1
-    fi
+    echo "MySQL oder MariaDB not found in system" >> $LOG_FILE
+    sql_info_dimensions=$(calculating_box "$DEFINED_LANG/sql_info.txt.txt")
+    apt-get install mariadb-server -y >> $LOG_FILE | dialog --title "$(cat $DEFINED_LANG/please_wait.txt)" --msgbox "$(cat $DEFINED_LANG/sql_info.txt.txt)" $sql_info_dimensions
 fi
 
 # Prepare sql_setupinfo.txt
@@ -187,7 +180,7 @@ install_info_dimensions=$(calculating_box "$DEFINED_LANG/install_info.txt")
 dialog --title "$(cat $DEFINED_LANG/install.txt)" --msgbox "$(cat $DEFINED_LANG/install_info.txt)" $install_info_dimensions
 install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$(cat $DEFINED_LANG/install.txt)" 40 120
 wait_info_dimensions=$(calculating_box "$DEFINED_LANG/wait_info.txt")
-dialog --title "$(cat $DEFINED_LANG/install.txt)" --msgbox "$(cat $DEFINED_LANG/wait_info.txt)" $install_info_dimensions
+dialog --title "$(cat $DEFINED_LANG/install.txt)" --msgbox "$(cat $DEFINED_LANG/wait_info.txt)" $wait_info_dimensions
 
 # Prepare the Database
 {

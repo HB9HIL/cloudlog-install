@@ -1,2 +1,1 @@
-Du hast angegeben, dass du bereits über einen SQL Server verfügst.
-Läuft dieser SQL auf diesem Server?
+Ein SQL Server wird installiert (mariadb-server).
