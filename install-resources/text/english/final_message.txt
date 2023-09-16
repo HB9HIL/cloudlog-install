@@ -24,6 +24,5 @@ When you have completed the install wizard, do the following:
     - If you want to know if the person you're working uses LoTW, run: http://$LOCAL_IP/index.php/lotw/load_users. This is the initial run, but we'll run this every week from cron momentarily.
 
 Thank you for using this script. If you encounter any issues, please contact support@hb9hil.org for assistance.
-Thank you for using this script.
 
 Press Enter to exit and show the Database Password...
