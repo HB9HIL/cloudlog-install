@@ -14,9 +14,9 @@ DB_USER=cloudloguser
 DB_PASSWORD=$(openssl rand -base64 16)
 INSTALL_PATH=/var/www/cloudlog
 DEBUG_MODE=false
-LOG_FILE=install-resources/log/installation.log ## Don't change if you don't need to, file will be overwritten!
-MINIMUM_DEPENCIES="git dialog wget" ## Minimum Depencies to run this script
-DEPENCIES="apache2 curl php-common php-curl php-mbstring php-mysql php-xml libapache2-mod-php" ## Without mariadb-server
+LOG_FILE=install-resources/log/installation.log 
+MINIMUM_DEPENCIES="git dialog wget"
+DEPENCIES="apache2 curl php-common php-curl php-mbstring php-mysql php-xml libapache2-mod-php"
 CLOUDLOG_REPO="-b dev https://github.com/magicbug/Cloudlog.git"
 
 export TMP_DIR
@@ -80,10 +80,10 @@ securing_mysql() {
 MYSQL_ROOT_PASSWORD=""
 UNIX_SOCKET="n"
 CHANGE_ROOT_PWD="n"
-REMOVE_ANONYMOUS_USERS="y"   # Remove anonymous users (y/n)
-DISALLOW_ROOT_LOGIN_REMOTE="y"   # Disallow root login remotely (y/n)
-REMOVE_TEST_DATABASE="y"   # Remove test database and access to it (y/n)
-RELOAD_PRIVILEGE_TABLES="y"   # Reload privilege tables now (y/n)
+REMOVE_ANONYMOUS_USERS="y" 
+DISALLOW_ROOT_LOGIN_REMOTE="y"  
+REMOVE_TEST_DATABASE="y"  
+RELOAD_PRIVILEGE_TABLES="y"   
 
 # Run mysql_secure_installation with predefined answers
 echo "Configuring MySQL server..."
@@ -223,7 +223,7 @@ apache2_config_content=$(cat install-resources/apache2_config_cloudlog.conf)
 echo "$apache2_config_content" | tee /etc/apache2/sites-available/cloudlog.conf > /dev/null
 
 # Change Cloudlog's Developement Mode into Production Mode
-sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'production');/" "$INSTALL_PATH/index.php"
+sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'production');/" $INSTALL_PATH/index.php
 
 # Activate Apache2
 a2ensite cloudlog.conf
