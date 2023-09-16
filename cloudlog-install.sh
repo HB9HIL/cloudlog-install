@@ -220,7 +220,7 @@ a2enmod proxy_fcgi setenvif
 a2enmod ssl
 
 apache2_config_content=$(cat install-resources/apache2_config_cloudlog.conf)
-echo "$apache2_config_content" | tee /etc/apache2/sites-available/cloudlog.conf > /dev/null
+echo "$apache2_config_content" | tee /etc/apache2/sites-available/cloudlog.conf >> $LOG_FILE
 
 # Change Cloudlog's Developement Mode into Production Mode
 sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'production');/" $INSTALL_PATH/index.php
@@ -229,7 +229,6 @@ sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'productio
 a2ensite cloudlog.conf
 systemctl restart apache2
 
-clear
 {
 sed -i "s/\$DB_NAME/$DB_NAME/g" $DEFINED_LANG/final_message.txt
 sed -i "s/\$DB_USER/$DB_USER/g" $DEFINED_LANG/final_message.txt
