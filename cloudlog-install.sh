@@ -151,7 +151,7 @@ if dpkg -l | grep -E 'mysql-server|mariadb-server'; then
 else    
     echo "MySQL oder MariaDB not found in system" >> $LOG_FILE
     sql_info_dimensions=$(calculating_box "$DEFINED_LANG/sql_info.txt.txt")
-    apt-get install mariadb-server -y >> $LOG_FILE | dialog --title "$(cat $DEFINED_LANG/please_wait.txt)" --msgbox "$(cat $DEFINED_LANG/sql_info.txt.txt)" $sql_info_dimensions
+    apt-get install mariadb-server -y | tee -a $LOG_FILE | dialog --title "$(cat $DEFINED_LANG/please_wait.txt)" --msgbox "$(cat $DEFINED_LANG/sql_info.txt.txt)" $sql_info_dimensions
 fi
 
 # Prepare sql_setupinfo.txt
