@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -a
+
 WEBMASTER_EMAIL="yourmail@example.com"
 
 # Set Variables (You shouldn't touch)
@@ -18,15 +20,3 @@ APACHE_CONF_NAME=cloudlog.conf
 APACHE_CONF_PATH=/etc/apache2/sites-available/$APACHE_CONF_NAME
 DEFINED_LANG="$TMP_DIR/install-resources/text/english"
 
-# export LOCAL_IP
-# export DEFINED_LANG
-# export TMP_DIR
-# export DB_NAME
-# export DB_USER
-# export INSTALL_PATH
-# export LOG_FILE
-# export MINIMUM_DEPENCIES
-# export DEPENCIES
-# export CLOUDLOG_REPO
-# export APACHE_CONF_NAME
-# export APACHE_CONF_PATH
