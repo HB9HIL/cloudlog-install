@@ -227,15 +227,18 @@ sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'productio
 
 # Activate Apache2
 a2ensite cloudlog.conf
-systemctl restart apache2
+cp $INSTALL_PATH/.htaccess.sample .htaccess
 
 {
 sed -i "s#\$DB_NAME#$DB_NAME#g" $DEFINED_LANG/final_message.txt
 sed -i "s#\$DB_USER#$DB_USER#g" $DEFINED_LANG/final_message.txt
-sed -i "s#\$DB_PASSWORD#$DB_PASSWORD#g" "$DEFINED_LANG/final_message.txt"
+sed -i "s#\$DB_PASSWORD#$DB_PASSWORD#g" $DEFINED_LANG/final_message.txt
 sed -i "s#\$LOCAL_IP#$LOCAL_IP#g" $DEFINED_LANG/final_message.txt
+sed -i "s#\$INSTALL_PATH#$INSTALL_PATH#g" /etc/apache2/sites-available/cloudlog.conf
 } >> $LOG_FILE
 
+systemctl restart apache2
+echo "Restart Apache2" >> $LOG_FILE
 
 dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 40 140
 
