@@ -39,7 +39,7 @@ cp -r install-resources $TMP_DIR
 
 ## Functions
 errorstop() {
-    clear 
+    # clear 
     echo "Uuups... Something went wrong here, Try to start the script again."
     echo "Please create an issue at https://github.com/HB9HIL/cloudlog-install/issues"
     echo "!!! ERRORSTOP !!!" >> $LOG_FILE
@@ -197,7 +197,7 @@ mysql -u root -e "FLUSH PRIVILEGES"
 
 # Prepare the Webroot Folder
 mkdir -p $INSTALL_PATH
-git clone $CLOUDLOG_REPO $INSTALL_PATH 2>> $LOG_FILE
+git clone $CLOUDLOG_REPO $INSTALL_PATH >> $LOG_FILE
 
 # Set the Permissions
 {
