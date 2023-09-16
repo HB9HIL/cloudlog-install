@@ -8,10 +8,23 @@
 # shellcheck source=/dev/null
 
 # Snippets einbinden
+SNIPPETS_DIR=install-resources/snippets
 chmod 755 config.sh
-chmod -R 755 install-resources/snippets
+chmod -R 755 $SNIPPETS_DIR
 source config.sh
-source install-resources/snippets/*.sh
+if [ -d "$SNIPPETS_DIR" ]; then
+    for snippet_file in "$SNIPPETS_DIR"/*.sh; do
+        if [ -f "$snippet_file" ] && [ -x "$snippet_file" ]; then
+            source "$snippet_file"
+        else
+            echo "Error: Cannot execute file '$snippet_file'."
+        fi
+    done
+else
+    clear
+    echo "Error: The 'snippets' directory does not exist."
+    exit 1
+fi
 
 trap 'errorstop' ERR
 
