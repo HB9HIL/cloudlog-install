@@ -7,103 +7,22 @@
 # shellcheck disable=SC2120
 # shellcheck source=/dev/null
 
-# Variables
-TMP_DIR=/tmp/cloudlog-tmp
-DB_NAME=cloudlog
-DB_USER=cloudloguser
-DB_PASSWORD=$(openssl rand -base64 16)
-INSTALL_PATH=/var/www/cloudlog
-DEBUG_MODE=false
-LOG_FILE=install-resources/log/installation.log 
-MINIMUM_DEPENCIES="git dialog wget"
-DEPENCIES="apache2 curl php-common php-curl php-mbstring php-mysql php-xml libapache2-mod-php"
-CLOUDLOG_REPO="-b dev https://github.com/magicbug/Cloudlog.git"
+# Snippets einbinden
+chmod +x config.sh
+chmod +x install-resources/snippets/*.sh
+source config.sh
+source install-resources/snippets/*.sh
 
-export TMP_DIR
-export DB_NAME
-export DB_USER
-export INSTALL_PATH
-export DEBUG_MODE
-export SQLREQUIRED
-export LOG_FILE
+trap 'errorstop' ERR
 
-# Set Variables (You shouldn't touch)
-LOCAL_IP=$(ip -o -4 addr show scope global | awk '{split($4,a,"/");print a[1];exit}')
-DEFINED_LANG=""
-
-rm $LOG_FILE && touch $LOG_FILE
+# Clear the Log
+> $LOG_FILE
 
 # Prepare language files
 mkdir -p $TMP_DIR
 cp -r install-resources $TMP_DIR
 
-## Functions
-errorstop() {
-    # clear 
-    echo "Uuups... Something went wrong here, Try to start the script again."
-    echo "Please create an issue at https://github.com/HB9HIL/cloudlog-install/issues"
-    echo "!!! ERRORSTOP !!!" >> $LOG_FILE
-    local error_message="$1"
-    echo "The script run into an error: $error_message" >&2 
-    echo "The script run into an error: $error_message" >> "$LOG_FILE"
-    read -r -p "Press Enter to stop the script. Restart it manually."
-    exit 1
-}
-trap 'errorstop' ERR
-
-calculating_box() {
-    local content_file="$1"
-    local lines
-    lines=$(wc -l < "$content_file")
-    local max_width=90
-    local max_height=$((lines + 6))  # Adding a buffer for title and buttons
-    echo "$max_height $max_width"
-}
-
-install_packages() {
-    apt-get update
-    apt-get install $DEPENCIES -y
-    echo ""
-    echo ""
-    echo "$(cat $DEFINED_LANG/press_enter.txt)"
-}
-
-install_sql() {
-    apt-get install mariadb-server -y
-    echo ""
-    echo ""
-    echo "$(cat $DEFINED_LANG/press_enter.txt)"
-}
-
-securing_mysql() {
-# Set your preferred secure installation options
-MYSQL_ROOT_PASSWORD=""
-UNIX_SOCKET="n"
-CHANGE_ROOT_PWD="n"
-REMOVE_ANONYMOUS_USERS="y" 
-DISALLOW_ROOT_LOGIN_REMOTE="y"  
-REMOVE_TEST_DATABASE="y"  
-RELOAD_PRIVILEGE_TABLES="y"   
-
-# Run mysql_secure_installation with predefined answers
-echo "Configuring MySQL server..."
-
-# Run mysql_secure_installation non-interactively with predefined answers
-sudo mysql_secure_installation <<EOF
-$MYSQL_ROOT_PASSWORD
-$UNIX_SOCKET
-$CHANGE_ROOT_PWD
-$REMOVE_ANONYMOUS_USERS
-$DISALLOW_ROOT_LOGIN_REMOTE
-$REMOVE_TEST_DATABASE
-$RELOAD_PRIVILEGE_TABLES
-EOF
-
-echo "MySQL secure installation completed."
-}
-
 # Minimum depencies Installation
-DEFINED_LANG="$TMP_DIR/install-resources/text/english"
 echo ">>>  apt-get update" >> $LOG_FILE
 info_updating_dimensions=$(calculating_box "$DEFINED_LANG/info_updating.txt")
 dialog --title "Update Repositories" --infobox "$(cat $DEFINED_LANG/info_updating.txt)" $info_updating_dimensions;  apt-get update >> $LOG_FILE
@@ -148,6 +67,10 @@ else
     exit 1
 fi
 
+# Set Mail Adress for the Webmaster
+webmaster_email_dimensions=$(calculating_box "$DEFINED_LANG/webmaster_email.txt")
+WEBMASTER_EMAIL=$(dialog --title "Webmaster E-Mail" --inputbox "$(cat $DEFINED_LANG/webmaster_email.txt)" $webmaster_email_dimensions 3>&1 1>&2 2>&3)
+echo "User set Webmaster E-Mail Adress to '$WEBMASTER_EMAIL'" >> $LOG_FILE
 
 # Database Setup
 if dpkg -l | grep -E 'mysql-server|mariadb-server'; then
@@ -155,6 +78,7 @@ if dpkg -l | grep -E 'mysql-server|mariadb-server'; then
 else    
     echo "MySQL oder MariaDB not found in system" >> $LOG_FILE
     install_sql | tee -a $LOG_FILE | dialog --no-ok --programbox "$(cat $DEFINED_LANG/sql_info.txt)" 40 120
+    securing_mysql
 fi
 
 # Prepare sql_setupinfo.txt
@@ -187,7 +111,6 @@ dialog --title "$(cat $DEFINED_LANG/install.txt)" --msgbox "$(cat $DEFINED_LANG/
 
 # Prepare the Database
 {
-securing_mysql
 mysql -u root -e "CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD'"
 mysql -u root -e "CREATE DATABASE $DB_NAME"
 mysql -u root -e "GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'%'"
@@ -199,46 +122,30 @@ mkdir -p $INSTALL_PATH
 git clone $CLOUDLOG_REPO $INSTALL_PATH >> $LOG_FILE
 
 # Set the Permissions
-{
-chown -R root:www-data $INSTALL_PATH/application/config/
-chown -R root:www-data $INSTALL_PATH/assets/qslcard/
-chown -R root:www-data $INSTALL_PATH/backup/
-chown -R root:www-data $INSTALL_PATH/updates/
-chown -R root:www-data $INSTALL_PATH/uploads/
-chown -R root:www-data $INSTALL_PATH/images/eqsl_card_images/
-chmod -R g+rw $INSTALL_PATH/application/config/
-chmod -R g+rw $INSTALL_PATH/assets/qslcard/
-chmod -R g+rw $INSTALL_PATH/backup/
-chmod -R g+rw $INSTALL_PATH/updates/
-chmod -R g+rw $INSTALL_PATH/uploads/
-chmod -R g+rw $INSTALL_PATH/images/eqsl_card_images/
-} >> $LOG_FILE
+set_permissions
 
 # Configure Apache2
 a2dissite 000-default.conf
-a2enmod proxy_fcgi setenvif
-a2enmod ssl
+a2enmod proxy_fcgi setenvif ssl
 
 apache2_config_content=$(cat install-resources/apache2_config_cloudlog.conf)
-echo "$apache2_config_content" | tee /etc/apache2/sites-available/cloudlog.conf >> $LOG_FILE
+echo "$apache2_config_content" | tee $APACHE_CONF_PATH >> $LOG_FILE
+sed -i "s#\$INSTALL_PATH#$INSTALL_PATH#g" $APACHE_CONF_PATH
+sed -i "s#\$WEBMASTER_EMAIL#$WEBMASTER_EMAIL#g" $APACHE_CONF_PATH
+a2ensite $APACHE_CONF_NAME
+cp $INSTALL_PATH/.htaccess.sample .htaccess
+systemctl restart apache2
+echo "Restart Apache2" >> $LOG_FILE
 
 # Change Cloudlog's Developement Mode into Production Mode
 sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'production');/" $INSTALL_PATH/index.php
-
-# Activate Apache2
-a2ensite cloudlog.conf
-cp $INSTALL_PATH/.htaccess.sample .htaccess
 
 {
 sed -i "s#\$DB_NAME#$DB_NAME#g" $DEFINED_LANG/final_message.txt
 sed -i "s#\$DB_USER#$DB_USER#g" $DEFINED_LANG/final_message.txt
 sed -i "s#\$DB_PASSWORD#$DB_PASSWORD#g" $DEFINED_LANG/final_message.txt
 sed -i "s#\$LOCAL_IP#$LOCAL_IP#g" $DEFINED_LANG/final_message.txt
-sed -i "s#\$INSTALL_PATH#$INSTALL_PATH#g" /etc/apache2/sites-available/cloudlog.conf
 } >> $LOG_FILE
-
-systemctl restart apache2
-echo "Restart Apache2" >> $LOG_FILE
 
 dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 40 140
 

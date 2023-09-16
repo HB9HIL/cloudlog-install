@@ -6,7 +6,7 @@ Access the following address with your web browser: http://$LOCAL_IP/install
 
 Now enter the following data in the installer. Note that any reverse proxy must be configured BEFORE clicking 'Install':
 
-DIRECTORY.............. left empty or $INSTALL_PATH
+DIRECTORY.............. left empty
 Webseite URL........... planned URL to reach Cloudlog
 Default Gridsquare..... your local Maidenhead-Locator
 Hostname:.............. localhost
