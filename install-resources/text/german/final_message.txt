@@ -11,7 +11,7 @@ Webseite URL............ geplante URL zum Erreichen von Cloudlog
 Default Gridsquare...... Ihr lokaler Maidenhead-Locator
 Hostname................ localhost
 Username................ $DB_USER
-Password................ $DB_PASSWORD
+Password................ Wird im nächsten Schritt angezeigt!
 Database Name........... $DB_NAME
 
 Klicken Sie anschließend auf "Installieren".
@@ -26,4 +26,4 @@ Wenn Sie den Installationsassistenten abgeschlossen haben, führen Sie die folge
 Vielen Dank, dass Sie dieses Skript verwenden. Wenn Sie auf Probleme stoßen, kontaktieren Sie support@hb9hil.org für Unterstützung.
 Vielen Dank, dass Sie dieses Skript verwenden.
 
-Drücken Sie Enter, um das Script zu verlassen...
+Drücken Sie Enter, um das Script zu verlassen und das Datenbank Passwort anzuzeigen...

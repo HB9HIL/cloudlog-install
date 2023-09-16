@@ -7,7 +7,7 @@
 # shellcheck disable=SC2120
 # shellcheck source=/dev/null
 
-# Snippets einbinden
+# Include Snippets
 SNIPPETS_DIR=install-resources/snippets
 chmod 755 config.sh
 chmod -R 755 $SNIPPETS_DIR
@@ -156,11 +156,14 @@ sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'productio
 {
 sed -i "s#\$DB_NAME#$DB_NAME#g" $DEFINED_LANG/final_message.txt
 sed -i "s#\$DB_USER#$DB_USER#g" $DEFINED_LANG/final_message.txt
-sed -i "s#\$DB_PASSWORD#$DB_PASSWORD#g" $DEFINED_LANG/final_message.txt
 sed -i "s#\$LOCAL_IP#$LOCAL_IP#g" $DEFINED_LANG/final_message.txt
 } >> $LOG_FILE
 
 dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 40 140
+clear
+echo $(cat $DEFINED_LANG/show_dbpassword_1.txt) 
+echo $DB_PASSWORD
+read $(cat $DEFINED_LANG/show_dbpassword_2.txt)
 
 # Cleaning up
 DB_PASSWORD="hidden"
