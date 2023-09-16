@@ -9,7 +9,7 @@
 
 # Snippets einbinden
 chmod 755 config.sh
-chmod 755 install-resources/snippets/*.sh
+chmod -R 755 install-resources/snippets
 source config.sh
 source install-resources/snippets/*.sh
 
