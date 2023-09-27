@@ -37,17 +37,10 @@ mkdir -p $TMP_DIR
 cp -r install-resources $TMP_DIR
 
 # Minimum depencies Installation
-echo ">>>  apt-get update" >> $LOG_FILE
-info_updating_dimensions=$(calculating_box "$DEFINED_LANG/info_updating.txt")
-dialog --title "Update Repositories" --infobox "$(cat $DEFINED_LANG/info_updating.txt)" $info_updating_dimensions;  apt-get update >> $LOG_FILE
 
-echo ">>>  apt-get upgrade -y" >> $LOG_FILE
-info_upgrading_dimensions=$(calculating_box "$DEFINED_LANG/info_upgrading.txt")
-dialog --title "Upgrade System" --infobox "$(cat $DEFINED_LANG/info_upgrading.txt)" $info_upgrading_dimensions;  apt-get upgrade -y >> $LOG_FILE
-
-echo ">>>  apt-get install $MINIMUM_DEPENCIES -y" >> $LOG_FILE
-info_installing_dimensions=$(calculating_box "$DEFINED_LANG/info_installing.txt")
-dialog --title "Install Minimum Depencies" --infobox "$(cat $DEFINED_LANG/info_installing.txt)" $info_installing_dimensions;  apt-get install $MINIMUM_DEPENCIES -y >> $LOG_FILE
+apt-get update >> $LOG_FILE
+apt-get upgrade -y >> $LOG_FILE
+apt-get install $MINIMUM_DEPENCIES -y >> $LOG_FILE
 
 
 # Choose language
