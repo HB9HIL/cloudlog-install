@@ -149,7 +149,7 @@ sed -i "s#\$LOCAL_IP#$LOCAL_IP#g" $DEFINED_LANG/final_message.txt
 
 #dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 40 140
 clear
-echo $DEFINED_LANG/final_message.txt
+echo $(cat $DEFINED_LANG/final_message.txt)
 read -r
 
 # Cleaning up
