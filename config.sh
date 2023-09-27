@@ -13,7 +13,6 @@ DB_USER=cloudloguser
 DB_PASSWORD=$(openssl rand -base64 16)
 INSTALL_PATH=/var/www/cloudlog
 LOG_FILE=install-resources/log/installation.log 
-MINIMUM_DEPENCIES="git dialog"
 DEPENCIES="apache2 curl php-common php-curl php-mbstring php-mysql php-xml libapache2-mod-php"
 CLOUDLOG_REPO="https://github.com/magicbug/Cloudlog.git"
 APACHE_CONF_NAME=cloudlog.conf

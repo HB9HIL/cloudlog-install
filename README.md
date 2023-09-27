@@ -14,9 +14,11 @@ Supports English and German Language
 
 For detailed Information about this script you should check https://www.hb9hil.org/cloudlog-auf-einem-linux-server-installieren/ (german)
 
+You have to run this script as User root. "sudo" won't work properly here.
+
 Install
 ```
-sudo apt update && sudo apt install git -y && git clone https://github.com/HB9HIL/cloudlog-install.git && cd cloudlog-install && chmod +x cloudlog-install.sh && bash cloudlog-install.sh
+apt update && apt install dialog git -y && git clone https://github.com/HB9HIL/cloudlog-install.git && cd cloudlog-install && chmod +x cloudlog-install.sh && bash cloudlog-install.sh
 ```
 
 Config Options

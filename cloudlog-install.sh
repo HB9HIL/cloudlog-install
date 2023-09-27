@@ -36,13 +36,6 @@ trap 'errorstop' ERR
 mkdir -p $TMP_DIR
 cp -r install-resources $TMP_DIR
 
-# Minimum depencies Installation
-
-apt-get update >> $LOG_FILE
-apt-get upgrade -y >> $LOG_FILE
-apt-get install $MINIMUM_DEPENCIES -y >> $LOG_FILE
-
-
 # Choose language
 LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
     1 "English" \
@@ -150,15 +143,14 @@ sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'productio
 {
 sed -i "s#\$DB_NAME#$DB_NAME#g" $DEFINED_LANG/final_message.txt
 sed -i "s#\$DB_USER#$DB_USER#g" $DEFINED_LANG/final_message.txt
+sed -i "s#\$DB_PASSWORD#$DB_PASSWORD#g" $DEFINED_LANG/final_message.txt
 sed -i "s#\$LOCAL_IP#$LOCAL_IP#g" $DEFINED_LANG/final_message.txt
 } >> $LOG_FILE
 
-dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 40 140
+#dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 40 140
 clear
-echo $(cat $DEFINED_LANG/show_dbpassword_1.txt) 
-echo $DB_PASSWORD
-echo $(cat $DEFINED_LANG/show_dbpassword_2.txt)
-read -r 
+echo $DEFINED_LANG/final_message.txt
+read -r
 
 # Cleaning up
 DB_PASSWORD="hidden"
