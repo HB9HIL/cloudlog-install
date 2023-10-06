@@ -1,0 +1,3 @@
+The system is updating the package repositories. 
+
+Please wait... This can take a while...

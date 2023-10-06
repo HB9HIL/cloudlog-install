@@ -1,0 +1,6 @@
+Leider werden mit diesem Installationsscript aktuell keine externen SQL Server unterstützt.
+
+Wenn du die Installation dennoch durchführen möchtest, ist es notwendig, dass auf diesem Server
+ein SQL Server läuft.
+
+Starte daher das Script erneut und gib an, dass ein SQL Server lokal installiert werden soll.

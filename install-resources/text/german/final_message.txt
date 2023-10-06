@@ -1,0 +1,28 @@
+>>> Das Skript ist nun abgeschlossen.
+
+Rufen Sie die folgende Adresse in Ihrem Webbrowser auf: http://$LOCAL_IP/install
+
+!!! Notieren Sie das DB_PASSWORD an einem sicheren Ort !!!
+
+Geben Sie nun die folgenden Daten in den Installer ein. Beachten Sie, dass ein Reverse Proxy VOR dem Klicken auf 'Installieren' konfiguriert werden muss:
+
+DIRECTORY............... leer lassen
+Webseite URL............ geplante URL zum Erreichen von Cloudlog
+Default Gridsquare...... Ihr lokaler Maidenhead-Locator
+Hostname................ localhost
+Username................ $DB_USER
+Password................ Wird im nächsten Schritt angezeigt!
+Database Name........... $DB_NAME
+
+Klicken Sie anschließend auf "Installieren".
+Herzlichen Glückwunsch. Sie können sich jetzt unter http://$LOCAL_IP/ oder der von Ihnen im Feld 'Webseiten-URL' festgelegten URL mit den Demo-Anmeldeinformationen anmelden.
+Wenn Sie den Installationsassistenten abgeschlossen haben, führen Sie die folgenden Schritte aus:
+     - Melden Sie sich mit dem Benutzernamen 'm0abc' und dem Passwort 'demo' an.
+     - Erstellen Sie ein neues Admin-Konto (Admin Dropdown) und löschen Sie das Demo-Konto.
+     - Aktualisieren Sie die Länderdateien (Admin Dropdown).
+     - Erstellen Sie ein Stationsprofil (Admin Dropdown) und setzen Sie es als aktiv.
+     - Wenn Sie wissen möchten, ob die Person, mit der Sie arbeiten, LoTW verwendet, führen Sie Folgendes aus: http://$LOCAL_IP/index.php/lotw/load_users. Dies ist der erste Durchlauf, aber wir werden dies jede Woche aus dem Cronjob heraus ausführen.
+
+Vielen Dank, dass Sie dieses Skript verwenden. Wenn Sie auf Probleme stoßen, kontaktieren Sie support@hb9hil.org für Unterstützung.
+
+Drücken Sie Enter, um das Script zu verlassen und das Datenbank Passwort anzuzeigen...

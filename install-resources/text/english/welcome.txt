@@ -1,0 +1,5 @@
+>>>      Welcome to this Cloudlog installation      <<<
+
+This script performs all necessary steps and guides you through the installation process.
+
+Press Enter to continue...

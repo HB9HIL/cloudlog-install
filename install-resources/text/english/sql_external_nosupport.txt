@@ -1,0 +1,5 @@
+Unfortunately, external SQL servers are currently not supported with this installation script.
+
+If you still want to execute the installation, it is necessary that a SQL server is running on this server.
+
+Therefore, start the script again and specify that a SQL server should be installed locally.
