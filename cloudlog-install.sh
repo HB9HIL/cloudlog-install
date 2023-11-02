@@ -30,8 +30,8 @@ cp -r install-resources $TMP_DIR
 
 # Choose language
 LANG_CHOICE=$(whiptail --title "Choose a Language" --menu "Choose a Language" 15 50 4 \
-    1 "English" \
-    2 "Deutsch") 
+    "1" "English" \
+    "2" "Deutsch") 
 #   3 [more languages] )
     
 # Set the DEFINED_LANG Variable
