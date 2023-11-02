@@ -1,13 +1,5 @@
 #!/bin/bashresources
 
-# shellcheck disable=SC1090
-# shellcheck disable=SC2086
-# shellcheck disable=SC2024
-# shellcheck disable=SC2005
-# shellcheck disable=SC2120
-# shellcheck disable=SC2046
-# shellcheck source=/dev/null
-
 # Include Snippets
 SNIPPETS_DIR=install-resources/snippets
 chmod 755 config.sh
