@@ -1,4 +1,4 @@
-# cloudlog Install Script
+# cloudlog Install Script DOES NOT WORK AT THE MOMENT, STILL IN PROGESS
 
 This Install Script is installing https://github.com/magicbug/Cloudlog on a Debian/Ubuntu System.
 
