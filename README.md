@@ -18,7 +18,7 @@ You have to run this script as User root. "sudo" won't work properly here.
 
 Install
 ```
-apt update && apt install dialog git -y && git clone https://github.com/HB9HIL/cloudlog-install.git && cd cloudlog-install && chmod +x cloudlog-install.sh && bash cloudlog-install.sh
+apt update && apt install whiptail git -y && git clone https://github.com/HB9HIL/cloudlog-install.git && cd cloudlog-install && chmod +x cloudlog-install.sh && bash cloudlog-install.sh
 ```
 
 Config Options
