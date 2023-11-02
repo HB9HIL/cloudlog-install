@@ -1,4 +1,4 @@
-#!/bin/bashresources
+#!/bin/bash
 
 # Include Snippets
 SNIPPETS_DIR=install-resources/snippets
@@ -29,11 +29,11 @@ mkdir -p $TMP_DIR
 cp -r install-resources $TMP_DIR
 
 # Choose language
-LANG_CHOICE=$(dialog --stdout --menu "Choose a Language" 0 0 0 \
+LANG_CHOICE=$(whiptail --title "Choose a Language" --menu "Choose a Language" 15 50 4 \
     1 "English" \
     2 "Deutsch") 
 #   3 [more languages] )
-
+    
 # Set the DEFINED_LANG Variable
 if [ "$LANG_CHOICE" == "1" ]; then
     echo "User chose english" >> $LOG_FILE
@@ -42,8 +42,8 @@ elif [ "$LANG_CHOICE" == "2" ]; then
     echo "User chose german" >> $LOG_FILE
     DEFINED_LANG="$TMP_DIR/install-resources/text/german"
 # elif [ "$LANG_CHOICE" == "[more numbers]" ]; then
-#    echo "User chose [language]" >> $LOG_FILE
-#    DEFINED_LANG="$TMP_DIR/install-resources/text/[more languages]"
+    #    echo "User chose [language]" >> $LOG_FILE
+    #    DEFINED_LANG="$TMP_DIR/install-resources/text/[more languages]"
 else
     errorstop
 fi
@@ -51,7 +51,7 @@ fi
 
 # Welcome Message
 welcome_dimensions=$(calculating_box "$DEFINED_LANG/welcome.txt")
-if dialog --title "Welcome" --msgbox "$(cat $DEFINED_LANG/welcome.txt)" $welcome_dimensions; then
+if whiptail --title "Welcome" --msgbox "$(cat $DEFINED_LANG/welcome.txt)" $welcome_dimensions; then
     echo "User accepted Welcome Message" >> $LOG_FILE
 else
     echo "User did not accept Welcome Message" >> $LOG_FILE
@@ -61,15 +61,15 @@ fi
 
 # Set Mail Adress for the Webmaster
 webmaster_email_dimensions=$(calculating_box "$DEFINED_LANG/webmaster_email.txt")
-WEBMASTER_EMAIL=$(dialog --title "Webmaster E-Mail" --inputbox "$(cat $DEFINED_LANG/webmaster_email.txt)" $webmaster_email_dimensions 3>&1 1>&2 2>&3)
+WEBMASTER_EMAIL=$(whiptail --title "Webmaster E-Mail" --inputbox "$(cat $DEFINED_LANG/webmaster_email.txt)" $webmaster_email_dimensions 3>&1 1>&2 2>&3)
 echo "User set Webmaster E-Mail Adress to '$WEBMASTER_EMAIL'" >> $LOG_FILE
 
 # Database Setup
 if dpkg -l | grep -E 'mysql-server|mariadb-server'; then
     echo "MySQL oder MariaDB found in system" >> $LOG_FILE
-else    
+else
     echo "MySQL oder MariaDB not found in system" >> $LOG_FILE
-    install_sql | tee -a $LOG_FILE | dialog --no-ok --programbox "$(cat $DEFINED_LANG/sql_info.txt)" 40 120
+    install_sql | tee -a $LOG_FILE | whiptail --title "SQL Info" --programbox "$(cat $DEFINED_LANG/sql_info.txt)" 40 120
     securing_mysql >> $LOG_FILE
 fi
 
@@ -78,28 +78,28 @@ sed -i "s/\$DB_NAME/$DB_NAME/g" $DEFINED_LANG/sql_setupinfo.txt >> $LOG_FILE
 sed -i "s/\$DB_USER/$DB_USER/g" $DEFINED_LANG/sql_setupinfo.txt >> $LOG_FILE
 
 sql_setupinfo_dimensions=$(calculating_box "$DEFINED_LANG/sql_setupinfo.txt")
-if dialog --title "SQL Setup" --yesno "$(cat $DEFINED_LANG/sql_setupinfo.txt)" $sql_setupinfo_dimensions; then
-    echo "User Input: User accepted the default credetials for the database setup. Password will be automatically generated" >> $LOG_FILE
+if whiptail --title "SQL Setup" --yesno "$(cat $DEFINED_LANG/sql_setupinfo.txt)" $sql_setupinfo_dimensions; then
+    echo "User Input: User accepted the default credentials for the database setup. Password will be automatically generated" >> $LOG_FILE
 else
     sql_dbname_dimensions=$(calculating_box "$DEFINED_LANG/sql_dbname.txt")
-    DB_NAME=$(dialog --title "SQL Setup" --inputbox "$(cat $DEFINED_LANG/sql_dbname.txt)" $sql_dbname_dimensions 3>&1 1>&2 2>&3)
+    DB_NAME=$(whiptail --title "SQL Setup" --inputbox "$(cat $DEFINED_LANG/sql_dbname.txt)" $sql_dbname_dimensions 3>&1 1>&2 2>&3)
     echo "User set Database Name to '$DB_NAME'" >> $LOG_FILE
 
     sql_dbuser_dimensions=$(calculating_box "$DEFINED_LANG/sql_dbuser.txt")
-    DB_USER=$(dialog --title "SQL Setup" --inputbox "$(cat $DEFINED_LANG/sql_dbuser.txt)" $sql_dbuser_dimensions 3>&1 1>&2 2>&3)
+    DB_USER=$(whiptail --title "SQL Setup" --inputbox "$(cat $DEFINED_LANG/sql_dbuser.txt)" $sql_dbuser_dimensions 3>&1 1>&2 2>&3)
     echo "User set Database User to '$DB_USER'" >> $LOG_FILE
 
     sql_dbpassword_dimensions=$(calculating_box "$DEFINED_LANG/sql_dbpassword.txt")
-    DB_PASSWORD=$(dialog --title "SQL Setup" --passwordbox "$(cat $DEFINED_LANG/sql_dbpassword.txt)" $sql_dbpassword_dimensions 3>&1 1>&2 2>&3)
+    DB_PASSWORD=$(whiptail --title "SQL Setup" --passwordbox "$(cat $DEFINED_LANG/sql_dbpassword.txt)" $sql_dbpassword_dimensions 3>&1 1>&2 2>&3)
     echo "User set a Password for the Database User - Hidden for Security" >> $LOG_FILE
 fi
 
-## Install all depencies
+# Install all dependencies
 install_info_dimensions=$(calculating_box "$DEFINED_LANG/install_info.txt")
-dialog --title "$(cat $DEFINED_LANG/install.txt)" --msgbox "$(cat $DEFINED_LANG/install_info.txt)" $install_info_dimensions
-install_packages | tee -a $LOG_FILE | dialog --no-ok --programbox "$(cat $DEFINED_LANG/install.txt)" 40 120
+whiptail --title "$(cat $DEFINED_LANG/install.txt)" --msgbox "$(cat $DEFINED_LANG/install_info.txt)" $install_info_dimensions
+install_packages | tee -a $LOG_FILE | whiptail --title "$(cat $DEFINED_LANG/install.txt)" --programbox "$(cat $DEFINED_LANG/install.txt)" 40 120
 wait_info_dimensions=$(calculating_box "$DEFINED_LANG/wait_info.txt")
-dialog --title "$(cat $DEFINED_LANG/install.txt)" --msgbox "$(cat $DEFINED_LANG/wait_info.txt)" $wait_info_dimensions
+whiptail --title "$(cat $DEFINED_LANG/install.txt)" --msgbox "$(cat $DEFINED_LANG/wait_info.txt)" $wait_info_dimensions
 
 # Prepare the Database
 {
@@ -129,7 +129,7 @@ cp $INSTALL_PATH/.htaccess.sample .htaccess
 systemctl restart apache2
 echo "Restart Apache2" >> $LOG_FILE
 
-# Change Cloudlog's Developement Mode into Production Mode
+# Change Cloudlog's Development Mode into Production Mode
 sed -i "s/define('ENVIRONMENT', 'development');/define('ENVIRONMENT', 'production');/" $INSTALL_PATH/index.php
 
 {
@@ -139,7 +139,7 @@ sed -i "s#\$DB_PASSWORD#$DB_PASSWORD#g" $DEFINED_LANG/final_message.txt
 sed -i "s#\$LOCAL_IP#$LOCAL_IP#g" $DEFINED_LANG/final_message.txt
 } >> $LOG_FILE
 
-dialog --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 40 140
+whiptail --title "$(cat $DEFINED_LANG/install_successful.txt)" --msgbox "$(cat $DEFINED_LANG/final_message.txt)" 40 140
 clear
 echo $(cat $DEFINED_LANG/final_message.txt)
 read -r
